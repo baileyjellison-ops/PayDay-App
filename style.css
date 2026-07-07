@@ -1,9 +1,19 @@
+/*
+==================================================
+PayDay Version 1.8.2
+style.css
+==================================================
+*/
+
+
 * {
 
 box-sizing:border-box;
+
 font-family:Arial, Helvetica, sans-serif;
 
 }
+
 
 
 body {
@@ -89,6 +99,30 @@ cursor:pointer;
 button:hover {
 
 background:#3b82f6;
+
+}
+
+
+
+button.secondary {
+
+background:#475569;
+
+}
+
+
+
+button.danger {
+
+background:#dc2626;
+
+}
+
+
+
+button.success {
+
+background:#16a34a;
 
 }
 
@@ -215,5 +249,235 @@ border-radius:8px;
 background:#064e3b;
 
 color:#6ee7b7;
+
+}
+
+
+
+.status.warning {
+
+background:#713f12;
+
+color:#fde047;
+
+}
+
+
+
+.status.error {
+
+background:#7f1d1d;
+
+color:#fca5a5;
+
+}
+
+
+
+/*
+==================================================
+FORM ELEMENTS
+==================================================
+*/
+
+
+input,
+select {
+
+width:100%;
+
+background:#0b1118;
+
+color:white;
+
+border:1px solid #334155;
+
+padding:12px;
+
+border-radius:8px;
+
+margin-top:8px;
+
+margin-bottom:12px;
+
+}
+
+
+
+label {
+
+color:#94a3b8;
+
+font-size:14px;
+
+}
+
+
+
+.form-grid {
+
+display:grid;
+
+grid-template-columns:
+
+repeat(auto-fit,minmax(200px,1fr));
+
+gap:15px;
+
+}
+
+
+
+.form-section {
+
+background:#101820;
+
+padding:15px;
+
+border-radius:10px;
+
+}
+
+
+
+/*
+==================================================
+BILL ACTIONS
+==================================================
+*/
+
+
+.action-row {
+
+display:flex;
+
+gap:8px;
+
+flex-wrap:wrap;
+
+}
+
+
+
+.small-button {
+
+padding:8px 12px;
+
+font-size:12px;
+
+}
+
+
+
+/*
+==================================================
+STATUS BADGES
+==================================================
+*/
+
+
+.badge {
+
+display:inline-block;
+
+padding:6px 12px;
+
+border-radius:20px;
+
+font-size:12px;
+
+font-weight:bold;
+
+}
+
+
+
+.badge.green {
+
+background:#064e3b;
+
+color:#6ee7b7;
+
+}
+
+
+
+.badge.yellow {
+
+background:#713f12;
+
+color:#fde047;
+
+}
+
+
+
+.badge.red {
+
+background:#7f1d1d;
+
+color:#fca5a5;
+
+}
+
+
+
+/*
+==================================================
+GRAPHIC MODE
+==================================================
+*/
+
+
+body.graphic {
+
+background:#020617;
+
+}
+
+
+
+body.graphic .panel {
+
+border:1px solid #2563eb;
+
+box-shadow:
+
+0 0 15px rgba(37,99,235,0.25);
+
+}
+
+
+
+/*
+==================================================
+RESPONSIVE
+==================================================
+*/
+
+
+@media(max-width:600px){
+
+
+.title {
+
+font-size:26px;
+
+}
+
+
+button {
+
+width:100%;
+
+}
+
+
+nav {
+
+flex-direction:column;
+
+}
+
 
 }
