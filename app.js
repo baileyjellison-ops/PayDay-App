@@ -251,6 +251,7 @@ value="${settings.leftoverTarget}">
 Pay Frequency
 </h3>
 
+
 <select id="frequency">
 
 
@@ -596,6 +597,7 @@ Add Bill
 }
 
 
+
 if(page==="reports"){
 
 
@@ -669,6 +671,8 @@ return "<p>No bills assigned</p>";
 
 let output="";
 
+let number=1;
+
 
 list.forEach(b=>{
 
@@ -678,22 +682,26 @@ output += `
 <div class="bill-item">
 
 <b>
-${b.name}
+${number}. ${b.name}
 </b>
 
 <br>
 
-Due:
+&nbsp;&nbsp;Due Date:
 ${b.due}
 
 <br>
 
-Amount:
+&nbsp;&nbsp;Amount:
 $${b.amount}
+
+<hr>
 
 </div>
 
 `;
+
+number++;
 
 });
 
