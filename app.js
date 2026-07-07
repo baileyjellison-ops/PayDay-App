@@ -1,4 +1,4 @@
-const bills = [
+let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 
 {
 name:"Rent",
@@ -82,6 +82,17 @@ studentLoans:30000
 
 
 
+function saveBills(){
+
+localStorage.setItem(
+"paydayBills",
+JSON.stringify(bills)
+);
+
+}
+
+
+
 function loadPage(page){
 
 
@@ -90,6 +101,11 @@ const app=document.getElementById("app");
 
 
 if(page==="dashboard"){
+
+
+let totalBills = bills.reduce(
+(sum,b)=>sum+b.amount,0
+);
 
 
 app.innerHTML=`
@@ -113,6 +129,19 @@ $${budget.income}
 <div class="panel">
 
 <div class="card-label">
+MONTHLY BILLS
+</div>
+
+<div class="card-value yellow">
+$${totalBills}
+</div>
+
+</div>
+
+
+<div class="panel">
+
+<div class="card-label">
 TOTAL DEBT
 </div>
 
@@ -122,19 +151,6 @@ budget.creditCard+
 budget.personalLoans+
 budget.studentLoans
 ).toLocaleString()}
-</div>
-
-</div>
-
-
-<div class="panel">
-
-<div class="card-label">
-NEXT PAYCHECK
-</div>
-
-<div class="card-value yellow">
-$${budget.paycheck}
 </div>
 
 </div>
@@ -150,19 +166,8 @@ System Status
 </h2>
 
 <div class="status">
-Budget engine online
+PayDay database online
 </div>
-
-
-<ul>
-
-<li>Savings minimum maintained</li>
-
-<li>Rent planning active</li>
-
-<li>Debt tracking active</li>
-
-</ul>
 
 
 </div>
@@ -179,7 +184,8 @@ if(page==="bills"){
 let rows="";
 
 
-bills.forEach(function(b){
+bills.forEach((b,index)=>{
+
 
 rows += `
 
@@ -193,9 +199,18 @@ rows += `
 
 <td>${b.type}</td>
 
+<td>
+
+<button onclick="deleteBill(${index})">
+Delete
+</button>
+
+</td>
+
 </tr>
 
 `;
+
 
 });
 
@@ -204,6 +219,7 @@ app.innerHTML=`
 
 <div class="panel">
 
+
 <h2>
 Bill Control Panel
 </h2>
@@ -211,23 +227,18 @@ Bill Control Panel
 
 <table>
 
+
 <tr>
 
-<th>
-Bill
-</th>
+<th>Name</th>
 
-<th>
-Amount
-</th>
+<th>Amount</th>
 
-<th>
-Due
-</th>
+<th>Due</th>
 
-<th>
-Type
-</th>
+<th>Type</th>
+
+<th></th>
 
 </tr>
 
@@ -238,7 +249,30 @@ ${rows}
 </table>
 
 
+<br>
+
+
+<h3>
+Add Bill
+</h3>
+
+
+<input id="billName" placeholder="Bill Name">
+
+
+<input id="billAmount" placeholder="Amount">
+
+
+<input id="billDue" placeholder="Due Date">
+
+
+<button onclick="addBill()">
+Add Bill
+</button>
+
+
 </div>
+
 
 `;
 
@@ -258,48 +292,22 @@ Paycheck Allocation
 </h2>
 
 
-<table>
-
-<tr>
-
-<td>
-Paycheck Amount
-</td>
-
-<td>
+<p>
+Paycheck:
 $2,184
-</td>
-
-</tr>
+</p>
 
 
-<tr>
-
-<td>
-Frequency
-</td>
-
-<td>
+<p>
+Frequency:
 Bi-Weekly
-</td>
-
-</tr>
+</p>
 
 
-<tr>
-
-<td>
-Savings Goal
-</td>
-
-<td>
+<p>
+Savings Goal:
 $100/check
-</td>
-
-</tr>
-
-
-</table>
+</p>
 
 
 </div>
@@ -318,23 +326,20 @@ app.innerHTML=`
 <div class="panel">
 
 <h2>
-Financial Reports
+Reports
 </h2>
 
 
 <p>
-Debt Summary
+Monthly Bills:
+$${bills.reduce((s,b)=>s+b.amount,0)}
 </p>
 
 
 <p>
-Credit Card: $${budget.creditCard.toLocaleString()}</p>
-
-<p>
-Personal Loans: $${budget.personalLoans.toLocaleString()}</p>
-
-<p>
-Student Loans: $${budget.studentLoans.toLocaleString()}</p>
+Credit Card:
+$${budget.creditCard.toLocaleString()}
+</p>
 
 
 </div>
@@ -363,13 +368,7 @@ Simulation Only
 
 
 <p>
-Changes here will not affect your real budget.
-</p>
-
-
-<p>
-Example:
-Extra Income +$500/month
+Future income and debt scenarios go here.
 </p>
 
 
@@ -379,6 +378,59 @@ Extra Income +$500/month
 
 }
 
+
+}
+
+
+
+function addBill(){
+
+
+let name=document.getElementById("billName").value;
+
+let amount=Number(
+document.getElementById("billAmount").value
+);
+
+let due=document.getElementById("billDue").value;
+
+
+if(name && amount){
+
+
+bills.push({
+
+name:name,
+
+amount:amount,
+
+due:due,
+
+type:"Custom"
+
+});
+
+
+saveBills();
+
+loadPage("bills");
+
+
+}
+
+
+}
+
+
+
+function deleteBill(index){
+
+
+bills.splice(index,1);
+
+saveBills();
+
+loadPage("bills");
 
 
 }
