@@ -19,13 +19,9 @@ let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 const budget = {
 
 income:4368,
-
 paycheck:2184,
-
 creditCard:16250,
-
 personalLoans:17000,
-
 studentLoans:30000
 
 };
@@ -120,6 +116,7 @@ app.innerHTML=`
 <h2>
 Dashboard
 </h2>
+
 
 <p>
 Monthly Income:
@@ -291,13 +288,11 @@ Delete
 
 </td>
 
-
 </tr>
 
 `;
 
 });
-
 
 
 app.innerHTML=`
@@ -334,6 +329,74 @@ ${rows}
 </table>
 
 
+<br>
+
+
+<h3>
+Add Bill
+</h3>
+
+
+<input id="billName" placeholder="Bill Name">
+
+
+<input id="billAmount" placeholder="Amount">
+
+
+<input id="billDue" placeholder="Due Date">
+
+
+<select id="billType">
+
+<option>
+Housing
+</option>
+
+<option>
+Debt
+</option>
+
+<option>
+Loan
+</option>
+
+<option>
+Utility
+</option>
+
+<option>
+Subscription
+</option>
+
+<option>
+Goal
+</option>
+
+</select>
+
+
+<select id="billPriority">
+
+<option value="1">
+Priority 1 - Required
+</option>
+
+<option value="2">
+Priority 2 - Debt
+</option>
+
+<option value="3">
+Priority 3 - Goal
+</option>
+
+</select>
+
+
+<button onclick="addBill()">
+Add Bill
+</button>
+
+
 </div>
 
 `;
@@ -353,7 +416,9 @@ Paycheck
 
 <p>
 Income:
-<b>$${budget.paycheck}</b>
+<b>
+$${budget.paycheck}
+</b>
 </p>
 
 
@@ -452,18 +517,6 @@ Test financial changes here without affecting your real budget.
 
 
 
-function deleteBill(index){
-
-bills.splice(index,1);
-
-saveBills();
-
-loadPage("bills");
-
-}
-
-
-
 function addBill(){
 
 
@@ -482,7 +535,9 @@ priority:Number(document.getElementById("billPriority").value)
 };
 
 
+
 if(bill.name && bill.amount){
+
 
 bills.push(bill);
 
@@ -490,11 +545,28 @@ saveBills();
 
 loadPage("bills");
 
-}
-
 
 }
 
 
+}
+
+
+
+function deleteBill(index){
+
+
+bills.splice(index,1);
+
+saveBills();
+
+loadPage("bills");
+
+
+}
+
+
+
+saveBills();
 
 loadPage("dashboard");
