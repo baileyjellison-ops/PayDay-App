@@ -1,6 +1,7 @@
 /*
 ==================================================
-PayDay Version 1.8.4
+PayDay Control System 1.9.0
+
 style.css
 
 Industrial HMI Theme
@@ -9,54 +10,41 @@ Industrial HMI Theme
 
 
 * {
-
-box-sizing:border-box;
-
-font-family:Arial, Helvetica, sans-serif;
-
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
 }
-
 
 
 body {
 
-margin:0;
-
-background:#0b1118;
-
-color:white;
+    margin:0;
+    background:#0b1118;
+    color:white;
 
 }
 
 
+.top-header {
 
-header {
-
-background:#172b3a;
-
-padding:20px;
-
-border-bottom:2px solid #2563eb;
+    background:#172b3a;
+    padding:22px;
+    border-bottom:2px solid #2563eb;
 
 }
-
 
 
 .title {
 
-font-size:32px;
-
-font-weight:bold;
+    font-size:34px;
+    font-weight:bold;
 
 }
 
 
-
 .subtitle {
 
-color:#94a3b8;
-
-margin-top:5px;
+    margin-top:5px;
+    color:#94a3b8;
 
 }
 
@@ -69,61 +57,47 @@ NAVIGATION
 */
 
 
-nav {
+.main-nav {
 
-display:flex;
-
-flex-wrap:wrap;
-
-gap:10px;
-
-padding:15px;
-
-background:#101820;
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    padding:15px;
+    background:#101820;
 
 }
-
 
 
 button {
 
-background:#2563eb;
-
-color:white;
-
-border:none;
-
-padding:14px 18px;
-
-border-radius:8px;
-
-font-weight:bold;
-
-cursor:pointer;
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:14px 18px;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
 
 }
-
 
 
 button:hover {
 
-background:#3b82f6;
+    background:#3b82f6;
 
 }
-
 
 
 button.danger {
 
-background:#dc2626;
+    background:#dc2626;
 
 }
 
 
-
 button.success {
 
-background:#16a34a;
+    background:#16a34a;
 
 }
 
@@ -131,7 +105,7 @@ background:#16a34a;
 
 main {
 
-padding:20px;
+    padding:20px;
 
 }
 
@@ -146,25 +120,19 @@ PANELS
 
 .panel {
 
-background:#172b3a;
-
-border-radius:12px;
-
-padding:20px;
-
-margin-bottom:15px;
+    background:#172b3a;
+    border-radius:12px;
+    padding:20px;
+    margin-bottom:15px;
 
 }
 
 
-
 .grid {
 
-display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-
-gap:15px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
 
 }
 
@@ -179,45 +147,81 @@ CARDS
 
 .card-label {
 
-color:#94a3b8;
-
-font-size:14px;
+    color:#94a3b8;
+    font-size:14px;
 
 }
-
 
 
 .card-value {
 
-font-size:32px;
-
-font-weight:bold;
-
-margin-top:10px;
+    font-size:32px;
+    font-weight:bold;
+    margin-top:10px;
 
 }
 
 
 
-.green {
+/*
+==================================================
+WATERFALL
+==================================================
+*/
 
-color:#4ade80;
+
+.waterfall {
+
+    background:#101820;
+    border-radius:12px;
+    margin-bottom:15px;
+    overflow:hidden;
 
 }
 
 
+.waterfall-header {
 
-.yellow {
-
-color:#facc15;
+    background:#1e293b;
+    padding:16px;
+    font-size:20px;
+    font-weight:bold;
+    cursor:pointer;
 
 }
 
 
+.waterfall-content {
 
-.red {
+    padding:15px;
 
-color:#f87171;
+}
+
+
+.waterfall-row {
+
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
+    border-bottom:1px solid #334155;
+
+}
+
+
+.waterfall-total {
+
+    padding-top:12px;
+    font-size:18px;
+    font-weight:bold;
+
+}
+
+
+.waterfall-remaining {
+
+    margin-top:8px;
+    color:#4ade80;
+    font-weight:bold;
 
 }
 
@@ -232,58 +236,37 @@ BILL CARDS
 
 .bill-card {
 
-
-background:#101820;
-
-border-radius:12px;
-
-padding:18px;
-
-margin-bottom:15px;
-
-
-border-left:4px solid #2563eb;
-
+    background:#101820;
+    border-radius:12px;
+    padding:18px;
+    margin-bottom:15px;
+    border-left:4px solid #2563eb;
 
 }
-
 
 
 .bill-title {
 
-
-font-size:22px;
-
-font-weight:bold;
-
+    font-size:22px;
+    font-weight:bold;
 
 }
-
 
 
 .bill-detail {
 
-
-color:#cbd5e1;
-
-margin-top:8px;
-
+    color:#cbd5e1;
+    margin-top:8px;
 
 }
-
 
 
 .action-row {
 
-
-display:flex;
-
-gap:10px;
-
-flex-wrap:wrap;
-
-margin-top:15px;
-
+    display:flex;
+    gap:10px;
+    margin-top:15px;
+    flex-wrap:wrap;
 
 }
 
@@ -291,122 +274,25 @@ margin-top:15px;
 
 /*
 ==================================================
-WATERFALL SECTIONS
-==================================================
-*/
-
-
-.waterfall {
-
-
-background:#101820;
-
-border-radius:12px;
-
-margin-bottom:15px;
-
-
-}
-
-
-
-.waterfall-header {
-
-
-padding:16px;
-
-font-size:20px;
-
-font-weight:bold;
-
-cursor:pointer;
-
-background:#1e293b;
-
-
-}
-
-
-
-.waterfall-content {
-
-
-padding:15px;
-
-
-}
-
-
-
-.waterfall-row {
-
-
-display:flex;
-
-justify-content:space-between;
-
-padding:10px 0;
-
-border-bottom:1px solid #334155;
-
-
-}
-
-
-
-.waterfall-total {
-
-
-font-weight:bold;
-
-font-size:18px;
-
-padding-top:15px;
-
-
-}
-
-
-
-/*
-==================================================
-ALLOCATION PANEL
+ALLOCATIONS
 ==================================================
 */
 
 
 .allocation {
 
-
-background:#101820;
-
-border-radius:12px;
-
-padding:20px;
-
+    background:#101820;
+    padding:20px;
+    border-radius:12px;
 
 }
-
 
 
 .allocation-row {
 
-
-display:flex;
-
-justify-content:space-between;
-
-padding:12px 0;
-
-
-}
-
-
-
-.allocation-percent {
-
-
-font-weight:bold;
+    display:flex;
+    justify-content:space-between;
+    padding:12px 0;
 
 }
 
@@ -419,52 +305,34 @@ FORMS
 */
 
 
-input,
-select {
+.form-grid {
 
-
-width:100%;
-
-background:#0b1118;
-
-color:white;
-
-border:1px solid #334155;
-
-padding:12px;
-
-border-radius:8px;
-
-margin-top:8px;
-
-margin-bottom:12px;
-
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:15px;
 
 }
 
+
+input,
+select {
+
+    width:100%;
+    background:#0b1118;
+    color:white;
+    border:1px solid #334155;
+    padding:12px;
+    border-radius:8px;
+    margin-top:8px;
+    margin-bottom:12px;
+
+}
 
 
 label {
 
-
-color:#94a3b8;
-
-font-size:14px;
-
-
-}
-
-
-
-.form-grid {
-
-
-display:grid;
-
-grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-
-gap:15px;
-
+    color:#94a3b8;
+    font-size:14px;
 
 }
 
@@ -479,39 +347,26 @@ STATUS
 
 .status {
 
-
-padding:12px;
-
-border-radius:8px;
-
-background:#064e3b;
-
-color:#6ee7b7;
-
+    padding:12px;
+    border-radius:8px;
+    background:#064e3b;
+    color:#6ee7b7;
 
 }
-
 
 
 .status.warning {
 
-
-background:#713f12;
-
-color:#fde047;
-
+    background:#713f12;
+    color:#fde047;
 
 }
 
 
-
 .status.error {
 
-
-background:#7f1d1d;
-
-color:#fca5a5;
-
+    background:#7f1d1d;
+    color:#fca5a5;
 
 }
 
@@ -526,40 +381,32 @@ RESPONSIVE
 
 @media(max-width:600px){
 
+    .title {
 
-.title {
+        font-size:26px;
 
-font-size:26px;
-
-}
-
+    }
 
 
-nav {
+    .main-nav {
 
-flex-direction:column;
+        flex-direction:column;
 
-}
-
-
-
-button {
-
-width:100%;
-
-}
+    }
 
 
+    button {
 
-.waterfall-row {
+        width:100%;
 
-
-flex-direction:column;
-
-gap:5px;
+    }
 
 
-}
+    .waterfall-row {
 
+        flex-direction:column;
+        gap:6px;
+
+    }
 
 }
