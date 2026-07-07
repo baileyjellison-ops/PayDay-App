@@ -111,6 +111,22 @@ ${value}
 `;
 
 }
+
+
+
+function formatPayDate(){
+
+if(settings.nextPayDate){
+
+let d = new Date(settings.nextPayDate);
+
+return d.toLocaleDateString();
+
+}
+
+return "Not Set";
+
+}
 function loadPage(page){
 
 const app=document.getElementById("app");
@@ -136,9 +152,6 @@ let goals = bills
 
 
 
-if(displayMode==="standard"){
-
-
 app.innerHTML=`
 
 <div class="panel">
@@ -157,7 +170,7 @@ $${budget.income}
 
 
 <p>
-Required Bills:
+Required:
 <b>
 $${required}
 </b>
@@ -165,7 +178,7 @@ $${required}
 
 
 <p>
-Debt Payments:
+Debt:
 <b>
 $${debt}
 </b>
@@ -182,73 +195,9 @@ $${goals}
 
 </div>
 
-
-<div class="panel">
-
-<div class="status">
-Standard Mode Active
-</div>
-
-</div>
-
-`;
-
-
-
-}else{
-
-
-app.innerHTML=`
-
-<div class="panel">
-
-<h2>
-PAYDAY STATUS
-</h2>
-
-
-${card(
-"INCOME",
-"$"+budget.income,
-"green"
-)}
-
-
-${card(
-"REQUIRED LOAD",
-"$"+required,
-"red"
-)}
-
-
-${card(
-"DEBT LOAD",
-"$"+debt,
-"yellow"
-)}
-
-
-${card(
-"GOAL LOAD",
-"$"+goals,
-"green"
-)}
-
-
-<div class="status">
-Graphic Mode Active
-</div>
-
-
-</div>
-
 `;
 
 }
-
-
-}
-
 
 
 
@@ -284,32 +233,26 @@ Graphic Mode
 Savings Minimum Per Paycheck
 </h3>
 
-
-<input 
-id="saveAmount"
+<input id="saveAmount"
 type="number"
-value="${settings.savingsMinimum}"
->
+value="${settings.savingsMinimum}">
 
 
 <h3>
 Leftover Cash Target
 </h3>
 
-
-<input
-id="cashTarget"
+<input id="cashTarget"
 type="number"
-value="${settings.leftoverTarget}"
->
+value="${settings.leftoverTarget}">
 
 
 <h3>
 Pay Frequency
 </h3>
 
-
 <select id="frequency">
+
 
 <option ${settings.payFrequency==="Weekly"?"selected":""}>
 Weekly
@@ -330,14 +273,14 @@ Monthly
 
 
 <h3>
-Next Pay Date
+Next Paycheck Date
 </h3>
 
 
-<input
+<input 
 id="payDate"
+type="date"
 value="${settings.nextPayDate}"
-placeholder="MM/DD/YYYY"
 >
 
 
@@ -354,6 +297,173 @@ Save Settings
 `;
 
 }
+
+
+
+if(page==="paycheck"){
+
+
+let priority1 = bills.filter(b=>b.priority===1);
+
+let priority2 = bills.filter(b=>b.priority===2);
+
+let priority3 = bills.filter(b=>b.priority===3);
+
+
+
+let total1 = priority1.reduce((s,b)=>s+b.amount,0);
+
+let total2 = priority2.reduce((s,b)=>s+b.amount,0);
+
+let total3 = priority3.reduce((s,b)=>s+b.amount,0);
+
+
+
+let assigned =
+total1+
+total2+
+total3;
+
+
+
+let available =
+budget.paycheck -
+assigned -
+settings.savingsMinimum -
+settings.leftoverTarget;
+
+
+
+app.innerHTML=`
+
+<div class="panel">
+
+<h2>
+Paycheck
+</h2>
+
+
+<p>
+Upcoming Paycheck:
+<b>
+${formatPayDate()}
+</b>
+</p>
+
+
+<p>
+Income:
+<b>
+$${budget.paycheck}
+</b>
+</p>
+
+
+
+<details open>
+
+<summary>
+Priority 1 - Required
+</summary>
+
+
+${createBillList(priority1)}
+
+
+<p>
+Total:
+<b>
+$${total1}
+</b>
+</p>
+
+
+</details>
+
+
+
+<details>
+
+<summary>
+Priority 2 - Debt
+</summary>
+
+
+${createBillList(priority2)}
+
+
+<p>
+Total:
+<b>
+$${total2}
+</b>
+</p>
+
+
+</details>
+
+
+
+<details>
+
+<summary>
+Priority 3 - Goals
+</summary>
+
+
+${createBillList(priority3)}
+
+
+<p>
+Total:
+<b>
+$${total3}
+</b>
+</p>
+
+
+</details>
+
+`;
+app.innerHTML += `
+
+<div class="panel">
+
+<h2>
+Paycheck Summary
+</h2>
+
+
+<p>
+Savings Target:
+<b>
+$${settings.savingsMinimum}
+</b>
+</p>
+
+
+<p>
+Protected Cash:
+<b>
+$${settings.leftoverTarget}
+</b>
+</p>
+
+
+<h3>
+Available:
+$${available}
+</h3>
+
+
+</div>
+
+`;
+
+}
+
+
+
 if(page==="bills"){
 
 
@@ -363,7 +473,7 @@ let rows="";
 bills.forEach((b,index)=>{
 
 
-rows+=`
+rows += `
 
 <tr>
 
@@ -386,12 +496,12 @@ Delete
 
 </td>
 
-
 </tr>
 
 `;
 
 });
+
 
 
 app.innerHTML=`
@@ -448,19 +558,13 @@ Add Bill
 <select id="billType">
 
 <option>Housing</option>
-
 <option>Debt</option>
-
 <option>Loan</option>
-
 <option>Utility</option>
-
 <option>Subscription</option>
-
 <option>Goal</option>
 
 </select>
-
 
 
 <select id="billPriority">
@@ -480,7 +584,6 @@ Priority 3 - Goal
 </select>
 
 
-
 <button onclick="addBill()">
 Add Bill
 </button>
@@ -493,107 +596,7 @@ Add Bill
 }
 
 
-
-
-if(page==="paycheck"){
-
-
-let required = bills
-.filter(b=>b.priority===1)
-.reduce((s,b)=>s+b.amount,0);
-
-
-
-let debt = bills
-.filter(b=>b.priority===2)
-.reduce((s,b)=>s+b.amount,0);
-
-
-
-let available =
-budget.paycheck
--
-required
--
-debt
--
-settings.savingsMinimum
--
-settings.leftoverTarget;
-
-
-
-app.innerHTML=`
-
-<div class="panel">
-
-<h2>
-Paycheck
-</h2>
-
-
-<p>
-Income:
-<b>
-$${budget.paycheck}
-</b>
-</p>
-
-
-<p>
-Priority 1 Bills:
-<b>
-$${required}
-</b>
-</p>
-
-
-<p>
-Priority 2 Debt:
-<b>
-$${debt}
-</b>
-</p>
-
-
-<p>
-Savings:
-<b>
-$${settings.savingsMinimum}
-</b>
-</p>
-
-
-<p>
-Protected Cash:
-<b>
-$${settings.leftoverTarget}
-</b>
-</p>
-
-
-<h3>
-Available:
-$${available}
-</h3>
-
-
-</div>
-
-`;
-
-}
-
-
-
-
 if(page==="reports"){
-
-
-let totalDebt =
-budget.creditCard+
-budget.personalLoans+
-budget.studentLoans;
 
 
 app.innerHTML=`
@@ -608,15 +611,11 @@ Reports
 <p>
 Total Debt:
 <b>
-$${totalDebt.toLocaleString()}
-</b>
-</p>
-
-
-<p>
-Monthly Bills:
-<b>
-$${bills.reduce((s,b)=>s+b.amount,0)}
+$${(
+budget.creditCard+
+budget.personalLoans+
+budget.studentLoans
+).toLocaleString()}
 </b>
 </p>
 
@@ -626,7 +625,6 @@ $${bills.reduce((s,b)=>s+b.amount,0)}
 `;
 
 }
-
 
 
 
@@ -659,7 +657,56 @@ Simulation Only
 
 
 
+function createBillList(list){
+
+
+if(list.length===0){
+
+return "<p>No bills assigned</p>";
+
+}
+
+
+let output="";
+
+
+list.forEach(b=>{
+
+
+output += `
+
+<div class="bill-item">
+
+<b>
+${b.name}
+</b>
+
+<br>
+
+Due:
+${b.due}
+
+<br>
+
+Amount:
+$${b.amount}
+
+</div>
+
+`;
+
+});
+
+
+return output;
+
+}
+
+
+
+
 function saveUserSettings(){
+
 
 settings.savingsMinimum =
 Number(document.getElementById("saveAmount").value);
@@ -675,7 +722,6 @@ document.getElementById("frequency").value;
 
 settings.nextPayDate =
 document.getElementById("payDate").value;
-
 
 
 saveSettings();
@@ -707,7 +753,6 @@ priority:Number(document.getElementById("billPriority").value)
 };
 
 
-
 if(bill.name && bill.amount){
 
 bills.push(bill);
@@ -725,6 +770,7 @@ loadPage("bills");
 
 
 function deleteBill(index){
+
 
 bills.splice(index,1);
 
