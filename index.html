@@ -1,51 +1,15 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+
+<meta charset="UTF-8">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>PayDay Test</title>
+<title>PayDay Control System</title>
 
-<style>
-
-body {
-    margin:0;
-    background:#101820;
-    color:white;
-    font-family:Arial;
-}
-
-header {
-    background:#182b3a;
-    padding:20px;
-    font-size:28px;
-    font-weight:bold;
-}
-
-nav {
-    padding:15px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-button {
-    background:#2563eb;
-    color:white;
-    border:0;
-    padding:15px;
-    border-radius:8px;
-    font-weight:bold;
-}
-
-.panel {
-    background:#182b3a;
-    margin:15px;
-    padding:20px;
-    border-radius:12px;
-}
-
-</style>
+<link rel="stylesheet" href="style.css">
 
 </head>
 
@@ -54,75 +18,57 @@ button {
 
 
 <header>
+
+<div class="title">
 PayDay
+</div>
+
+<div class="subtitle">
+Personal Finance Control System
+</div>
+
 </header>
+
 
 
 <nav>
 
-<button onclick="showDashboard()">
+<button onclick="loadPage('dashboard')">
 Dashboard
 </button>
 
 
-<button onclick="showBills()">
+<button onclick="loadPage('bills')">
 Bills
 </button>
 
 
-<button onclick="showPaycheck()">
+<button onclick="loadPage('paycheck')">
 Paycheck
+</button>
+
+
+<button onclick="loadPage('reports')">
+Reports
+</button>
+
+
+<button onclick="loadPage('scenario')">
+Scenario
 </button>
 
 
 </nav>
 
 
-<div id="screen" class="panel">
 
-Loading...
+<main id="app">
 
-</div>
-
-
-
-<script>
-
-
-function showDashboard(){
-
-document.getElementById("screen").innerHTML =
-
-"<h2>Dashboard</h2><p>PayDay system online.</p>";
-
-}
+</main>
 
 
 
-function showBills(){
-
-document.getElementById("screen").innerHTML =
-
-"<h2>Bills</h2><p>Rent: $1150</p><p>Credit Card: $300</p>";
-
-}
-
-
-
-function showPaycheck(){
-
-document.getElementById("screen").innerHTML =
-
-"<h2>Paycheck</h2><p>Next paycheck: $2184</p>";
-
-}
-
-
-
-showDashboard();
-
-
-</script>
+<script src="app.js"></script>
 
 
 </body>
