@@ -1,3 +1,6 @@
+let displayMode = localStorage.getItem("paydayDisplayMode") || "standard";
+
+
 let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 
 {name:"Rent",amount:1150,due:"1st",type:"Housing",priority:1},
@@ -16,9 +19,13 @@ let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 const budget = {
 
 income:4368,
+
 paycheck:2184,
+
 creditCard:16250,
+
 personalLoans:17000,
+
 studentLoans:30000
 
 };
@@ -36,6 +43,48 @@ JSON.stringify(bills)
 
 
 
+function saveSettings(){
+
+localStorage.setItem(
+"paydayDisplayMode",
+displayMode
+);
+
+}
+
+
+
+function setDisplayMode(mode){
+
+displayMode = mode;
+
+saveSettings();
+
+loadPage("settings");
+
+}
+
+
+
+function card(title,value,color=""){
+
+return `
+
+<div class="panel">
+
+<div class="card-label">
+${title}
+</div>
+
+<div class="card-value ${color}">
+${value}
+</div>
+
+</div>
+
+`;
+
+}
 function loadPage(page){
 
 const app=document.getElementById("app");
@@ -45,78 +94,162 @@ const app=document.getElementById("app");
 if(page==="dashboard"){
 
 
-let priority1 = bills
+let required = bills
 .filter(b=>b.priority===1)
 .reduce((s,b)=>s+b.amount,0);
 
 
-let priority2 = bills
+let debt = bills
 .filter(b=>b.priority===2)
 .reduce((s,b)=>s+b.amount,0);
 
 
-let priority3 = bills
+let goals = bills
 .filter(b=>b.priority===3)
 .reduce((s,b)=>s+b.amount,0);
 
 
 
+if(displayMode==="standard"){
+
+
 app.innerHTML=`
-
-<div class="grid">
-
-<div class="panel">
-<div class="card-label">
-Priority 1 Required
-</div>
-
-<div class="card-value red">
-$${priority1}
-</div>
-
-</div>
-
-
-<div class="panel">
-<div class="card-label">
-Priority 2 Debt
-</div>
-
-<div class="card-value yellow">
-$${priority2}
-</div>
-
-</div>
-
-
-<div class="panel">
-<div class="card-label">
-Priority 3 Goals
-</div>
-
-<div class="card-value green">
-$${priority3}
-</div>
-
-</div>
-
-
-</div>
-
 
 <div class="panel">
 
 <h2>
-System Status
+Dashboard
 </h2>
 
-<div class="status">
-Priority engine online
-</div>
+<p>
+Monthly Income:
+<b>$${budget.income}</b>
+</p>
+
 
 <p>
-Rent reserve logic ready.
+Required Bills:
+<b>$${required}</b>
 </p>
+
+
+<p>
+Debt Payments:
+<b>$${debt}</b>
+</p>
+
+
+<p>
+Goals:
+<b>$${goals}</b>
+</p>
+
+
+</div>
+
+
+<div class="panel">
+
+<div class="status">
+Standard Mode Active
+</div>
+
+</div>
+
+`;
+
+
+
+}else{
+
+
+
+app.innerHTML=`
+
+<div class="panel">
+
+<h2>
+PAYDAY STATUS
+</h2>
+
+
+${card(
+"INCOME",
+"$"+budget.income,
+"green"
+)}
+
+
+${card(
+"REQUIRED LOAD",
+"$"+required,
+"red"
+)}
+
+
+${card(
+"DEBT LOAD",
+"$"+debt,
+"yellow"
+)}
+
+
+${card(
+"GOAL LOAD",
+"$"+goals,
+"green"
+)}
+
+
+<div class="status">
+Graphic Mode Active
+</div>
+
+
+</div>
+
+`;
+
+}
+
+
+
+}
+
+
+
+
+if(page==="settings"){
+
+
+app.innerHTML=`
+
+<div class="panel">
+
+<h2>
+Display Settings
+</h2>
+
+
+<p>
+Current Mode:
+<b>
+${displayMode==="standard"?
+"Standard Mode":
+"Graphic Mode"}
+</b>
+</p>
+
+
+<button onclick="setDisplayMode('standard')">
+Standard Mode
+</button>
+
+
+<button onclick="setDisplayMode('graphic')">
+Graphic Mode
+</button>
+
 
 </div>
 
@@ -135,7 +268,7 @@ let rows="";
 bills.forEach((b,index)=>{
 
 
-rows += `
+rows+=`
 
 <tr>
 
@@ -147,9 +280,7 @@ rows += `
 
 <td>${b.type}</td>
 
-<td>
-${b.priority}
-</td>
+<td>${b.priority}</td>
 
 
 <td>
@@ -182,28 +313,17 @@ Bill Control Panel
 
 <tr>
 
-<th>
-Name
-</th>
+<th>Name</th>
 
-<th>
-Amount
-</th>
+<th>Amount</th>
 
-<th>
-Due
-</th>
+<th>Due</th>
 
-<th>
-Category
-</th>
+<th>Category</th>
 
-<th>
-Priority
-</th>
+<th>Priority</th>
 
-<th>
-</th>
+<th></th>
 
 </tr>
 
@@ -214,82 +334,12 @@ ${rows}
 </table>
 
 
-<br>
-
-
-<h3>
-Add Bill
-</h3>
-
-
-<input id="billName" placeholder="Bill Name">
-
-<input id="billAmount" placeholder="Amount">
-
-<input id="billDue" placeholder="Due Date">
-
-
-<select id="billType">
-
-<option>
-Housing
-</option>
-
-<option>
-Debt
-</option>
-
-<option>
-Loan
-</option>
-
-<option>
-Utility
-</option>
-
-<option>
-Subscription
-</option>
-
-<option>
-Goal
-</option>
-
-</select>
-
-
-<select id="billPriority">
-
-<option value="1">
-Priority 1 - Required
-</option>
-
-<option value="2">
-Priority 2 - Debt
-</option>
-
-<option value="3">
-Priority 3 - Goal
-</option>
-
-
-</select>
-
-
-<button onclick="addBill()">
-Add Bill
-</button>
-
-
 </div>
 
 `;
 
 }
-
-
-
-if(page==="paycheck"){
+  if(page==="paycheck"){
 
 
 app.innerHTML=`
@@ -297,23 +347,23 @@ app.innerHTML=`
 <div class="panel">
 
 <h2>
-Paycheck Allocation
+Paycheck
 </h2>
 
 
 <p>
-Paycheck:
-$2,184
+Income:
+<b>$${budget.paycheck}</b>
 </p>
 
 
 <p>
-Priority 1 bills are funded first.
+Priority 1 bills funded first
 </p>
 
 
 <p>
-Rent reserve enabled.
+Rent reserve enabled
 </p>
 
 
@@ -328,6 +378,12 @@ Rent reserve enabled.
 if(page==="reports"){
 
 
+let totalDebt =
+budget.creditCard+
+budget.personalLoans+
+budget.studentLoans;
+
+
 app.innerHTML=`
 
 <div class="panel">
@@ -336,9 +392,20 @@ app.innerHTML=`
 Reports
 </h2>
 
+
 <p>
-Total Monthly Commitments:
+Total Debt:
+<b>
+$${totalDebt.toLocaleString()}
+</b>
+</p>
+
+
+<p>
+Monthly Bills:
+<b>
 $${bills.reduce((s,b)=>s+b.amount,0)}
+</b>
 </p>
 
 
@@ -361,9 +428,16 @@ app.innerHTML=`
 Scenario Mode
 </h2>
 
+
 <div class="status">
 Simulation Only
 </div>
+
+
+<p>
+Test financial changes here without affecting your real budget.
+</p>
+
 
 </div>
 
@@ -371,6 +445,20 @@ Simulation Only
 
 }
 
+
+
+}
+
+
+
+
+function deleteBill(index){
+
+bills.splice(index,1);
+
+saveBills();
+
+loadPage("bills");
 
 }
 
@@ -394,7 +482,6 @@ priority:Number(document.getElementById("billPriority").value)
 };
 
 
-
 if(bill.name && bill.amount){
 
 bills.push(bill);
@@ -409,19 +496,5 @@ loadPage("bills");
 }
 
 
-
-function deleteBill(index){
-
-bills.splice(index,1);
-
-saveBills();
-
-loadPage("bills");
-
-}
-
-
-
-saveBills();
 
 loadPage("dashboard");
