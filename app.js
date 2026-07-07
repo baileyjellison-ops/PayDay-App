@@ -1,67 +1,14 @@
 let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 
-{
-name:"Rent",
-amount:1150,
-due:"1st",
-type:"Fixed"
-},
-
-{
-name:"Student Loan 1",
-amount:100,
-due:"5th",
-type:"Fixed"
-},
-
-{
-name:"Spotify",
-amount:12,
-due:"12th",
-type:"Fixed"
-},
-
-{
-name:"Electric",
-amount:75,
-due:"16th",
-type:"Fixed"
-},
-
-{
-name:"Student Loan 2",
-amount:238,
-due:"18th",
-type:"Fixed"
-},
-
-{
-name:"JCPenney Card",
-amount:50,
-due:"18th",
-type:"Debt"
-},
-
-{
-name:"Credit Card",
-amount:300,
-due:"22nd",
-type:"Debt"
-},
-
-{
-name:"Personal Loan",
-amount:444,
-due:"28th",
-type:"Debt"
-},
-
-{
-name:"Mom",
-amount:200,
-due:"Monthly",
-type:"Fixed"
-}
+{name:"Rent",amount:1150,due:"1st",type:"Housing",priority:1},
+{name:"Student Loan 1",amount:100,due:"5th",type:"Loan",priority:1},
+{name:"Spotify",amount:12,due:"12th",type:"Subscription",priority:3},
+{name:"Electric",amount:75,due:"16th",type:"Utility",priority:1},
+{name:"Student Loan 2",amount:238,due:"18th",type:"Loan",priority:1},
+{name:"JCPenney Card",amount:50,due:"18th",type:"Debt",priority:2},
+{name:"Credit Card",amount:300,due:"22nd",type:"Debt",priority:2},
+{name:"Personal Loan",amount:444,due:"28th",type:"Debt",priority:2},
+{name:"Mom",amount:200,due:"Monthly",type:"Family",priority:1}
 
 ];
 
@@ -69,13 +16,9 @@ type:"Fixed"
 const budget = {
 
 income:4368,
-
 paycheck:2184,
-
 creditCard:16250,
-
 personalLoans:17000,
-
 studentLoans:30000
 
 };
@@ -95,7 +38,6 @@ JSON.stringify(bills)
 
 function loadPage(page){
 
-
 const app=document.getElementById("app");
 
 
@@ -103,54 +45,57 @@ const app=document.getElementById("app");
 if(page==="dashboard"){
 
 
-let totalBills = bills.reduce(
-(sum,b)=>sum+b.amount,0
-);
+let priority1 = bills
+.filter(b=>b.priority===1)
+.reduce((s,b)=>s+b.amount,0);
+
+
+let priority2 = bills
+.filter(b=>b.priority===2)
+.reduce((s,b)=>s+b.amount,0);
+
+
+let priority3 = bills
+.filter(b=>b.priority===3)
+.reduce((s,b)=>s+b.amount,0);
+
 
 
 app.innerHTML=`
 
 <div class="grid">
 
-
 <div class="panel">
-
 <div class="card-label">
-MONTHLY INCOME
-</div>
-
-<div class="card-value green">
-$${budget.income}
-</div>
-
-</div>
-
-
-<div class="panel">
-
-<div class="card-label">
-MONTHLY BILLS
-</div>
-
-<div class="card-value yellow">
-$${totalBills}
-</div>
-
-</div>
-
-
-<div class="panel">
-
-<div class="card-label">
-TOTAL DEBT
+Priority 1 Required
 </div>
 
 <div class="card-value red">
-$${(
-budget.creditCard+
-budget.personalLoans+
-budget.studentLoans
-).toLocaleString()}
+$${priority1}
+</div>
+
+</div>
+
+
+<div class="panel">
+<div class="card-label">
+Priority 2 Debt
+</div>
+
+<div class="card-value yellow">
+$${priority2}
+</div>
+
+</div>
+
+
+<div class="panel">
+<div class="card-label">
+Priority 3 Goals
+</div>
+
+<div class="card-value green">
+$${priority3}
 </div>
 
 </div>
@@ -166,9 +111,12 @@ System Status
 </h2>
 
 <div class="status">
-PayDay database online
+Priority engine online
 </div>
 
+<p>
+Rent reserve logic ready.
+</p>
 
 </div>
 
@@ -200,6 +148,11 @@ rows += `
 <td>${b.type}</td>
 
 <td>
+${b.priority}
+</td>
+
+
+<td>
 
 <button onclick="deleteBill(${index})">
 Delete
@@ -207,18 +160,18 @@ Delete
 
 </td>
 
+
 </tr>
 
 `;
 
-
 });
+
 
 
 app.innerHTML=`
 
 <div class="panel">
-
 
 <h2>
 Bill Control Panel
@@ -227,18 +180,30 @@ Bill Control Panel
 
 <table>
 
-
 <tr>
 
-<th>Name</th>
+<th>
+Name
+</th>
 
-<th>Amount</th>
+<th>
+Amount
+</th>
 
-<th>Due</th>
+<th>
+Due
+</th>
 
-<th>Type</th>
+<th>
+Category
+</th>
 
-<th></th>
+<th>
+Priority
+</th>
+
+<th>
+</th>
 
 </tr>
 
@@ -259,11 +224,56 @@ Add Bill
 
 <input id="billName" placeholder="Bill Name">
 
-
 <input id="billAmount" placeholder="Amount">
 
-
 <input id="billDue" placeholder="Due Date">
+
+
+<select id="billType">
+
+<option>
+Housing
+</option>
+
+<option>
+Debt
+</option>
+
+<option>
+Loan
+</option>
+
+<option>
+Utility
+</option>
+
+<option>
+Subscription
+</option>
+
+<option>
+Goal
+</option>
+
+</select>
+
+
+<select id="billPriority">
+
+<option value="1">
+Priority 1 - Required
+</option>
+
+<option value="2">
+Priority 2 - Debt
+</option>
+
+<option value="3">
+Priority 3 - Goal
+</option>
+
+
+</select>
 
 
 <button onclick="addBill()">
@@ -272,7 +282,6 @@ Add Bill
 
 
 </div>
-
 
 `;
 
@@ -299,14 +308,12 @@ $2,184
 
 
 <p>
-Frequency:
-Bi-Weekly
+Priority 1 bills are funded first.
 </p>
 
 
 <p>
-Savings Goal:
-$100/check
+Rent reserve enabled.
 </p>
 
 
@@ -329,16 +336,9 @@ app.innerHTML=`
 Reports
 </h2>
 
-
 <p>
-Monthly Bills:
+Total Monthly Commitments:
 $${bills.reduce((s,b)=>s+b.amount,0)}
-</p>
-
-
-<p>
-Credit Card:
-$${budget.creditCard.toLocaleString()}
 </p>
 
 
@@ -361,16 +361,9 @@ app.innerHTML=`
 Scenario Mode
 </h2>
 
-
 <div class="status">
 Simulation Only
 </div>
-
-
-<p>
-Future income and debt scenarios go here.
-</p>
-
 
 </div>
 
@@ -386,35 +379,29 @@ Future income and debt scenarios go here.
 function addBill(){
 
 
-let name=document.getElementById("billName").value;
+let bill={
 
-let amount=Number(
-document.getElementById("billAmount").value
-);
+name:document.getElementById("billName").value,
 
-let due=document.getElementById("billDue").value;
+amount:Number(document.getElementById("billAmount").value),
+
+due:document.getElementById("billDue").value,
+
+type:document.getElementById("billType").value,
+
+priority:Number(document.getElementById("billPriority").value)
+
+};
 
 
-if(name && amount){
 
+if(bill.name && bill.amount){
 
-bills.push({
-
-name:name,
-
-amount:amount,
-
-due:due,
-
-type:"Custom"
-
-});
-
+bills.push(bill);
 
 saveBills();
 
 loadPage("bills");
-
 
 }
 
@@ -425,16 +412,16 @@ loadPage("bills");
 
 function deleteBill(index){
 
-
 bills.splice(index,1);
 
 saveBills();
 
 loadPage("bills");
 
-
 }
 
 
+
+saveBills();
 
 loadPage("dashboard");
