@@ -1,98 +1,143 @@
 /*
-PAYDAY VERSION 1.8
+==================================================
+PayDay Version 1.8.1
 app.js
-Part 1A/Part 1
+Part 1A / 2
 
-Core Data Engine
+Core Engine
+Data + Storage
+==================================================
 */
+
 
 "use strict";
 
 
 /*
-==============================
+==================================================
+GLOBAL APP STATE
+==================================================
+*/
+
+const PayDay = {
+
+
+    settings: {
+
+        payFrequency: "Bi-Weekly",
+
+        paycheckAmount: 2184,
+
+        nextPayDate: "2026-07-10",
+
+        savingsMinimum: 100,
+
+        leftoverTarget: 150,
+
+        displayMode: "standard"
+
+    },
+
+
+    bills: [],
+
+
+    scenarioBills: [],
+
+
+    selectedPaycheck: 0,
+
+
+    selectedMonth: new Date()
+
+
+};
+
+
+
+/*
+==================================================
 STORAGE KEYS
-==============================
+==================================================
 */
 
-const STORAGE = {
+const STORAGE_KEYS = {
 
-    settings: "payday_v18_settings",
-    bills: "payday_v18_bills"
+
+    settings:
+    "payday_settings",
+
+
+    bills:
+    "payday_bills",
+
+
+    scenario:
+    "payday_scenario"
+
+
 
 };
 
 
-/*
-==============================
-DEFAULT SETTINGS
-==============================
-*/
-
-let settings = {
-
-    payFrequency: "Bi-Weekly",
-
-    nextPayDate: "2026-07-10",
-
-    paycheckAmount: 2184,
-
-    savingsMinimum: 100,
-
-    leftoverTarget: 150,
-
-    displayMode: "standard"
-
-};
-
 
 /*
-==============================
-BILLS DATABASE
-==============================
-*/
-
-let bills = [];
-
-
-/*
-==============================
+==================================================
 ID GENERATOR
-==============================
+==================================================
 */
+
 
 function generateID(){
 
-    return Date.now() + Math.floor(Math.random()*1000);
+
+    return Date.now() +
+    Math.floor(Math.random()*1000);
+
 
 }
 
 
+
 /*
-==============================
-CREATE BILL OBJECT
-==============================
+==================================================
+BILL OBJECT CREATOR
+==================================================
 */
+
 
 function createBill(data){
 
+
     return {
 
-        id: generateID(),
 
-        name: data.name || "",
-
-        amount: Number(data.amount) || 0,
-
-        category: data.category || "Other",
-
-        priority: Number(data.priority) || 1,
+        id:
+        data.id || generateID(),
 
 
-        dueDay: Number(data.dueDay) || 1,
+        name:
+        data.name || "New Bill",
 
 
-        recurrence: data.recurrence || "Monthly",
+        amount:
+        Number(data.amount) || 0,
+
+
+        category:
+        data.category || "Other",
+
+
+        priority:
+        Number(data.priority) || 1,
+
+
+        dueDay:
+        Number(data.dueDay) || 1,
+
+
+        recurrence:
+        data.recurrence || "Monthly",
 
 
         nextOccurrence:
@@ -104,29 +149,40 @@ function createBill(data){
 
 
         assignedPaycheck:
-        data.assignedPaycheck || "",
+        data.assignedPaycheck || null,
 
 
         status:
         data.status || "Upcoming"
 
+
     };
+
 
 }
 
 
+
 /*
-==============================
-SAVE FUNCTIONS
-==============================
+==================================================
+SAVE DATA
+==================================================
 */
+
 
 function saveSettings(){
 
+
     localStorage.setItem(
-        STORAGE.settings,
-        JSON.stringify(settings)
+
+        STORAGE_KEYS.settings,
+
+        JSON.stringify(
+            PayDay.settings
+        )
+
     );
+
 
 }
 
@@ -134,292 +190,489 @@ function saveSettings(){
 
 function saveBills(){
 
+
     localStorage.setItem(
-        STORAGE.bills,
-        JSON.stringify(bills)
+
+        STORAGE_KEYS.bills,
+
+        JSON.stringify(
+            PayDay.bills
+        )
+
     );
 
+
 }
+
+
+
+function saveScenario(){
+
+
+    localStorage.setItem(
+
+        STORAGE_KEYS.scenario,
+
+        JSON.stringify(
+            PayDay.scenarioBills
+        )
+
+    );
+
+
+}
+
 
 
 /*
-==============================
-LOAD FUNCTIONS
-==============================
+==================================================
+LOAD DATA
+==================================================
 */
+
 
 function loadSettings(){
 
-    let saved =
-    localStorage.getItem(STORAGE.settings);
+
+    const data =
+    localStorage.getItem(
+        STORAGE_KEYS.settings
+    );
 
 
-    if(saved){
 
-        settings =
-        {
-            ...settings,
-            ...JSON.parse(saved)
+    if(data){
+
+
+        PayDay.settings = {
+
+            ...PayDay.settings,
+
+            ...JSON.parse(data)
+
         };
+
 
     }
 
+
 }
+
 
 
 
 function loadBills(){
 
-    let saved =
-    localStorage.getItem(STORAGE.bills);
+
+    const data =
+    localStorage.getItem(
+        STORAGE_KEYS.bills
+    );
 
 
-    if(saved){
 
-        bills =
-        JSON.parse(saved);
+    if(data){
+
+
+        PayDay.bills =
+        JSON.parse(data);
+
 
     }
 
+
 }
 
 
+
+
+function loadScenario(){
+
+
+    const data =
+    localStorage.getItem(
+        STORAGE_KEYS.scenario
+    );
+
+
+
+    if(data){
+
+
+        PayDay.scenarioBills =
+        JSON.parse(data);
+
+
+    }
+
+
+}
+
+
+
 /*
-==============================
+==================================================
 CLEAR DATA
-==============================
+==================================================
 */
+
 
 function clearAllData(){
 
+
     localStorage.removeItem(
-        STORAGE.settings
+        STORAGE_KEYS.settings
     );
 
 
     localStorage.removeItem(
-        STORAGE.bills
+        STORAGE_KEYS.bills
     );
 
 
-    settings = {
-
-        payFrequency:"Bi-Weekly",
-
-        nextPayDate:"2026-07-10",
-
-        paycheckAmount:2184,
-
-        savingsMinimum:100,
-
-        leftoverTarget:150,
-
-        displayMode:"standard"
-
-    };
+    localStorage.removeItem(
+        STORAGE_KEYS.scenario
+    );
 
 
-    bills=[];
 
+    location.reload();
 
-    saveSettings();
-
-    saveBills();
 
 }
 
 
 
 /*
-==============================
-SAMPLE BUDGET
-==============================
+==================================================
+SAMPLE BUDGET LOADER
+==================================================
 */
+
 
 function loadSampleBudget(){
 
 
-    bills = [
 
-        createBill({
+PayDay.bills = [
 
-            name:"Rent",
 
-            amount:1150,
+createBill({
 
-            category:"Housing",
+name:"Rent",
 
-            priority:1,
+amount:1150,
 
-            dueDay:1,
+category:"Housing",
 
-            recurrence:"Monthly"
+priority:1,
 
-        }),
+dueDay:1,
 
+recurrence:"Monthly"
 
-        createBill({
+}),
 
-            name:"Student Loan 1",
 
-            amount:100,
 
-            category:"Loan",
+createBill({
 
-            priority:1,
+name:"Student Loan 1",
 
-            dueDay:5,
+amount:100,
 
-            recurrence:"Monthly"
+category:"Loan",
 
-        }),
+priority:1,
 
+dueDay:5,
 
-        createBill({
+recurrence:"Monthly"
 
-            name:"Spotify",
+}),
 
-            amount:12,
 
-            category:"Subscription",
 
-            priority:3,
+createBill({
 
-            dueDay:12,
+name:"Spotify",
 
-            recurrence:"Monthly"
+amount:12,
 
-        }),
+category:"Subscription",
 
+priority:3,
 
-        createBill({
+dueDay:12,
 
-            name:"Electric",
+recurrence:"Monthly"
 
-            amount:75,
+}),
 
-            category:"Utility",
 
-            priority:1,
 
-            dueDay:16,
+createBill({
 
-            recurrence:"Monthly"
+name:"Electric",
 
-        }),
+amount:75,
 
+category:"Utility",
 
-        createBill({
+priority:1,
 
-            name:"Student Loan 2",
+dueDay:16,
 
-            amount:238,
+recurrence:"Monthly"
 
-            category:"Loan",
+}),
 
-            priority:1,
 
-            dueDay:18,
 
-            recurrence:"Monthly"
+createBill({
 
-        }),
+name:"Student Loan 2",
 
+amount:238,
 
-        createBill({
+category:"Loan",
 
-            name:"JCPenney Card",
+priority:1,
 
-            amount:50,
+dueDay:18,
 
-            category:"Debt",
+recurrence:"Monthly"
 
-            priority:2,
+}),
 
-            dueDay:18,
 
-            recurrence:"Monthly"
 
-        }),
+createBill({
 
+name:"JCPenney Card",
 
-        createBill({
+amount:50,
 
-            name:"Credit Card",
+category:"Debt",
 
-            amount:300,
+priority:2,
 
-            category:"Debt",
+dueDay:18,
 
-            priority:2,
+recurrence:"Monthly"
 
-            dueDay:22,
+}),
 
-            recurrence:"Monthly"
 
-        }),
 
+createBill({
 
-        createBill({
+name:"Credit Card",
 
-            name:"Personal Loan",
+amount:300,
 
-            amount:444,
+category:"Debt",
 
-            category:"Debt",
+priority:2,
 
-            priority:2,
+dueDay:22,
 
-            dueDay:28,
+recurrence:"Monthly"
 
-            recurrence:"Monthly"
+}),
 
-        }),
 
 
-        createBill({
+createBill({
 
-            name:"Mom",
+name:"Personal Loan",
 
-            amount:200,
+amount:444,
 
-            category:"Family",
+category:"Debt",
 
-            priority:1,
+priority:2,
 
-            dueDay:1,
+dueDay:28,
 
-            recurrence:"Monthly"
+recurrence:"Monthly"
 
-        })
+}),
 
-    ];
 
 
-    saveBills();
+createBill({
+
+name:"Mom",
+
+amount:200,
+
+category:"Family",
+
+priority:1,
+
+dueDay:1,
+
+recurrence:"Monthly"
+
+})
+
+];
+
+
+
+saveBills();
+
+
+
+alert(
+"Sample Budget Loaded"
+);
+
+
 
 }
+
+
+
 /*
-PAYDAY VERSION 1.8
+==================================================
+ADD / UPDATE / REMOVE BILLS
+==================================================
+*/
+
+
+function addBill(billData){
+
+
+PayDay.bills.push(
+
+createBill(billData)
+
+);
+
+
+saveBills();
+
+
+}
+
+
+
+
+function deleteBill(id){
+
+
+PayDay.bills =
+
+PayDay.bills.filter(
+
+bill =>
+bill.id !== id
+
+);
+
+
+
+saveBills();
+
+
+}
+
+
+
+
+function updateBill(id,changes){
+
+
+let bill =
+
+PayDay.bills.find(
+
+b=>b.id===id
+
+);
+
+
+
+if(!bill)
+return;
+
+
+
+Object.assign(
+
+bill,
+
+changes
+
+);
+
+
+
+saveBills();
+
+
+}
+
+
+
+/*
+==================================================
+INITIAL LOAD
+==================================================
+*/
+
+
+function initializeData(){
+
+
+loadSettings();
+
+
+loadBills();
+
+
+loadScenario();
+
+
+}
+
+
+
+initializeData();
+/*
+==================================================
+PayDay Version 1.8.1
 app.js
-Part 1B/Part 1
+Part 1B / 2
 
-Core Calculation Engine
+Paycheck Engine + Forecast Calculations
+==================================================
 */
 
 
 /*
-==============================
+==================================================
 DATE HELPERS
-==============================
+==================================================
 */
 
 
-function parseDate(date){
+function toDate(value){
+
+
+    if(value instanceof Date){
+
+        return value;
+
+    }
+
 
     return new Date(
-        date + "T00:00:00"
+        value + "T00:00:00"
     );
+
 
 }
 
@@ -427,296 +680,13 @@ function parseDate(date){
 
 function formatDate(date){
 
-    return date
-        .toLocaleDateString(
-            "en-US",
-            {
-                month:"2-digit",
-                day:"2-digit",
-                year:"numeric"
-            }
-        );
 
-}
-
-
-
-function addDays(date,days){
-
-    let result =
-    new Date(date);
-
-    result.setDate(
-        result.getDate()+days
-    );
-
-    return result;
-
-}
-
-
-
-function addMonths(date,months){
-
-    let result =
-    new Date(date);
-
-    result.setMonth(
-        result.getMonth()+months
-    );
-
-    return result;
-
-}
-
-
-/*
-==============================
-PAY FREQUENCY HELPERS
-==============================
-*/
-
-
-function getFrequencyDays(){
-
-
-    if(settings.payFrequency==="Weekly"){
-
-        return 7;
-
-    }
-
-
-    if(settings.payFrequency==="Bi-Weekly"){
-
-        return 14;
-
-    }
-
-
-    return 30;
-
-
-}
-
-
-
-/*
-==============================
-GENERATE FUTURE PAYCHECKS
-==============================
-*/
-
-
-function generatePaychecks(count=12){
-
-
-    let results=[];
-
-
-    let current =
-    parseDate(
-        settings.nextPayDate
-    );
-
-
-    let days =
-    getFrequencyDays();
-
-
-
-    for(let i=0;i<count;i++){
-
-
-        let start =
-        new Date(current);
-
-
-
-        let end =
-        addDays(
-            start,
-            days-1
-        );
-
-
-
-        results.push({
-
-            id:i+1,
-
-            payDate:
-            start,
-
-            periodStart:
-            start,
-
-            periodEnd:
-            end,
-
-
-            income:
-            settings.paycheckAmount
-
-
-        });
-
-
-
-        current =
-        addDays(
-            current,
-            days
-        );
-
-
-    }
-
-
-    return results;
-
-
-}
-
-
-
-/*
-==============================
-BILL OCCURRENCE HELPERS
-==============================
-*/
-
-
-function getNextOccurrence(bill){
-
-
-    let today =
-    new Date();
-
-
-
-    if(
-        bill.recurrence==="One-Time"
-    ){
-
-        return bill.nextOccurrence;
-
-    }
-
-
-
-    let next =
-    new Date(
-        today
-    );
-
-
-
-    if(
-        bill.recurrence==="Weekly"
-    ){
-
-        next.setDate(
-            next.getDate()+7
-        );
-
-    }
-
-
-
-    if(
-        bill.recurrence==="Bi-Weekly"
-    ){
-
-        next.setDate(
-            next.getDate()+14
-        );
-
-    }
-
-
-
-    if(
-        bill.recurrence==="Monthly"
-    ){
-
-        next.setMonth(
-            next.getMonth()+1
-        );
-
-    }
-
-
-
-    return next
-        .toISOString()
-        .split("T")[0];
-
-
-}
-
-
-
-/*
-==============================
-ASSIGN BILLS TO PAYCHECK
-==============================
-*/
-
-
-function getBillsForPaycheck(paycheck){
-
-
-    return bills.filter(
-        bill=>{
-
-
-            if(
-                bill.assignment==="Manual"
-            ){
-
-                return (
-                    bill.assignedPaycheck
-                    ===
-                    paycheck.id
-                );
-
-            }
-
-
-
-            let due =
-            Number(
-                bill.dueDay
-            );
-
-
-
-            let start =
-            paycheck.periodStart;
-
-
-
-            let end =
-            paycheck.periodEnd;
-
-
-
-            let dueDate =
-            new Date(
-                start.getFullYear(),
-                start.getMonth(),
-                due
-            );
-
-
-
-            return (
-                dueDate >= start &&
-                dueDate <= end
-            );
-
-
+    return date.toLocaleDateString(
+        "en-US",
+        {
+            month:"2-digit",
+            day:"2-digit",
+            year:"numeric"
         }
     );
 
@@ -725,36 +695,342 @@ function getBillsForPaycheck(paycheck){
 
 
 
+function addDays(date,amount){
+
+
+    let result =
+    new Date(date);
+
+
+    result.setDate(
+        result.getDate()+amount
+    );
+
+
+    return result;
+
+
+}
+
+
+
+function addMonths(date,amount){
+
+
+    let result =
+    new Date(date);
+
+
+    result.setMonth(
+        result.getMonth()+amount
+    );
+
+
+    return result;
+
+
+}
+
+
+
 /*
-==============================
-PRIORITY GROUPING
-==============================
+==================================================
+PAY FREQUENCY
+==================================================
 */
 
 
-function groupBillsByPriority(list){
+function getPayPeriodDays(){
+
+
+    switch(
+        PayDay.settings.payFrequency
+    ){
+
+
+        case "Weekly":
+
+            return 7;
+
+
+
+        case "Bi-Weekly":
+
+            return 14;
+
+
+
+        case "Monthly":
+
+            return 30;
+
+
+
+        default:
+
+            return 14;
+
+
+    }
+
+
+}
+
+
+
+/*
+==================================================
+GENERATE FUTURE PAYCHECKS
+==================================================
+*/
+
+
+function generatePaychecks(numberOfChecks = 12){
+
+
+    let checks = [];
+
+
+    let currentDate =
+    toDate(
+        PayDay.settings.nextPayDate
+    );
+
+
+    let days =
+    getPayPeriodDays();
+
+
+
+    for(
+        let i = 0;
+        i < numberOfChecks;
+        i++
+    ){
+
+
+        let periodStart =
+        new Date(currentDate);
+
+
+
+        let periodEnd =
+        addDays(
+            periodStart,
+            days - 1
+        );
+
+
+
+        checks.push({
+
+
+            id:i,
+
+
+            payDate:
+            new Date(currentDate),
+
+
+            periodStart,
+
+
+            periodEnd,
+
+
+            income:
+            PayDay.settings.paycheckAmount
+
+
+
+        });
+
+
+
+        currentDate =
+        addDays(
+            currentDate,
+            days
+        );
+
+
+    }
+
+
+    return checks;
+
+
+}
+
+
+
+/*
+==================================================
+CHECK IF BILL FALLS IN PAY PERIOD
+==================================================
+*/
+
+
+function billFallsInPeriod(
+    bill,
+    paycheck
+){
+
+
+    /*
+    Manual assignment override
+    */
+
+
+    if(
+        bill.assignment === "Manual"
+    ){
+
+
+        return (
+            bill.assignedPaycheck ===
+            paycheck.id
+        );
+
+
+    }
+
+
+
+    /*
+    Recurring bills
+    */
+
+
+    let dueDate =
+    new Date(
+
+        paycheck.periodStart.getFullYear(),
+
+        paycheck.periodStart.getMonth(),
+
+        bill.dueDay
+
+    );
+
+
+
+    return (
+
+        dueDate >= paycheck.periodStart &&
+
+        dueDate <= paycheck.periodEnd
+
+    );
+
+
+}
+
+
+
+/*
+==================================================
+GET BILLS FOR PAYCHECK
+==================================================
+*/
+
+
+function getBillsForPaycheck(
+    paycheck,
+    billList = PayDay.bills
+){
+
+
+    return billList.filter(
+
+        bill =>
+
+        billFallsInPeriod(
+            bill,
+            paycheck
+        )
+
+    );
+
+
+}
+
+
+
+/*
+==================================================
+BILL TOTALS
+==================================================
+*/
+
+
+function calculateBillTotal(
+    billArray
+){
+
+
+    return billArray.reduce(
+
+        (total,bill)=>
+
+        total + Number(bill.amount),
+
+        0
+
+    );
+
+
+}
+
+
+
+/*
+==================================================
+GROUP BY PRIORITY
+==================================================
+*/
+
+
+function splitBillsByPriority(
+    billArray
+){
 
 
     return {
 
+
         priority1:
 
-        list.filter(
-            b=>b.priority===1
+        billArray.filter(
+
+            bill =>
+
+            bill.priority === 1
+
         ),
+
 
 
         priority2:
 
-        list.filter(
-            b=>b.priority===2
+        billArray.filter(
+
+            bill =>
+
+            bill.priority === 2
+
         ),
+
 
 
         priority3:
 
-        list.filter(
-            b=>b.priority===3
+        billArray.filter(
+
+            bill =>
+
+            bill.priority === 3
+
         )
 
 
@@ -766,103 +1042,125 @@ function groupBillsByPriority(list){
 
 
 /*
-==============================
-SUM BILL GROUP
-==============================
+==================================================
+PAYCHECK WATERFALL CALCULATION
+==================================================
 */
 
 
-function totalBills(list){
+function calculatePaycheck(
+    paycheck,
+    billList = PayDay.bills
+){
 
 
-    return list.reduce(
-        (total,bill)=>
-        total+Number(bill.amount),
-        0
-    );
+    let paycheckBills =
 
-
-}
-
-
-
-/*
-==============================
-PAYCHECK WATERFALL
-==============================
-*/
-
-
-function calculatePaycheck(paycheck){
-
-
-    let assigned =
     getBillsForPaycheck(
-        paycheck
+
+        paycheck,
+
+        billList
+
     );
 
 
 
     let groups =
-    groupBillsByPriority(
-        assigned
+
+    splitBillsByPriority(
+
+        paycheckBills
+
     );
 
 
 
-    let starting =
+    let startingBalance =
+
     paycheck.income;
 
 
 
-    let priority1 =
-    totalBills(
+    let priority1Total =
+
+    calculateBillTotal(
+
         groups.priority1
+
     );
 
 
 
     let afterPriority1 =
-    starting -
-    priority1;
+
+    startingBalance -
+
+    priority1Total;
 
 
 
-    let priority2 =
-    totalBills(
+    let priority2Total =
+
+    calculateBillTotal(
+
         groups.priority2
+
     );
 
 
 
     let afterPriority2 =
+
     afterPriority1 -
-    priority2;
+
+    priority2Total;
 
 
 
-    let priority3 =
-    totalBills(
+    let priority3Total =
+
+    calculateBillTotal(
+
         groups.priority3
+
     );
 
 
 
     let afterPriority3 =
+
     afterPriority2 -
-    priority3;
+
+    priority3Total;
+
+
+
+    let savings =
+
+    PayDay.settings.savingsMinimum;
 
 
 
     let afterSavings =
+
     afterPriority3 -
-    settings.savingsMinimum;
+
+    savings;
+
+
+
+    let protectedCash =
+
+    PayDay.settings.leftoverTarget;
 
 
 
     let finalAvailable =
+
     afterSavings -
-    settings.leftoverTarget;
+
+    protectedCash;
 
 
 
@@ -872,19 +1170,19 @@ function calculatePaycheck(paycheck){
         paycheck,
 
 
-        bills:assigned,
+        bills:paycheckBills,
 
 
-        priority1,
+        startingBalance,
 
 
-        priority2,
+        priority1Total,
 
 
-        priority3,
+        priority2Total,
 
 
-        starting,
+        priority3Total,
 
 
         afterPriority1,
@@ -896,10 +1194,14 @@ function calculatePaycheck(paycheck){
         afterPriority3,
 
 
-        afterSavings,
+        savings,
+
+
+        protectedCash,
 
 
         finalAvailable
+
 
 
     };
@@ -910,43 +1212,52 @@ function calculatePaycheck(paycheck){
 
 
 /*
-==============================
+==================================================
 FORECAST STATUS
-==============================
+==================================================
 */
 
 
-function getForecastStatus(result){
+function getForecastStatus(
+    paycheckResult
+){
 
 
     if(
-        result.finalAvailable < 0
+        paycheckResult.finalAvailable < 0
     ){
+
 
         return {
 
-            status:"Shortfall",
 
-            color:"red"
+            text:"Shortfall",
+
+            className:"red"
+
 
         };
+
 
     }
 
 
 
     if(
-        result.finalAvailable <
-        100
+        paycheckResult.finalAvailable < 100
     ){
+
 
         return {
 
-            status:"Tight",
 
-            color:"yellow"
+            text:"Tight",
+
+            className:"yellow"
+
 
         };
+
 
     }
 
@@ -954,9 +1265,11 @@ function getForecastStatus(result){
 
     return {
 
-        status:"Healthy",
 
-        color:"green"
+        text:"Healthy",
+
+        className:"green"
+
 
     };
 
@@ -966,77 +1279,137 @@ function getForecastStatus(result){
 
 
 /*
-==============================
-INITIAL LOAD
-==============================
+==================================================
+MONTHLY TOTALS
+==================================================
 */
 
 
-loadSettings();
+function calculateMonthlyIncome(){
 
-loadBills();
+
+    return (
+
+        PayDay.settings.paycheckAmount *
+
+        (
+            PayDay.settings.payFrequency === "Weekly"
+            ? 4
+            : 2
+        )
+
+    );
+
+
+}
+
+
+
+function calculateMonthlyBills(){
+
+
+    return calculateBillTotal(
+
+        PayDay.bills
+
+    );
+
+
+}
+
+
+
+function calculateMonthlyRemaining(){
+
+
+    return (
+
+        calculateMonthlyIncome()
+
+        -
+
+        calculateMonthlyBills()
+
+    );
+
+
+}
 /*
-PAYDAY VERSION 1.8
+==================================================
+PayDay Version 1.8.1
 app.js
-Part 2/3
+Part 2 / 2
 
-UI Pages
+UI Engine
+==================================================
 */
 
 
 /*
-==============================
-APP NAVIGATION
-==============================
+==================================================
+NAVIGATION
+==================================================
 */
 
 
 function loadPage(page){
 
 
-    const app =
-    document.getElementById("app");
+    switch(page){
 
 
-    if(!app){
+        case "dashboard":
 
-        return;
+            renderDashboard();
 
-    }
-
-
-
-    if(page==="dashboard"){
-
-        renderDashboard();
-
-    }
+            break;
 
 
-    if(page==="bills"){
+        case "bills":
 
-        renderBills();
+            renderBills();
 
-    }
-
-
-    if(page==="paycheck"){
-
-        renderPaycheck();
-
-    }
+            break;
 
 
-    if(page==="monthly"){
+        case "paycheck":
 
-        renderMonthly();
+            renderPaycheck();
 
-    }
+            break;
 
 
-    if(page==="settings"){
+        case "reports":
 
-        renderSettings();
+            renderReports();
+
+            break;
+
+
+        case "scenario":
+
+            renderScenario();
+
+            break;
+
+
+        case "settings":
+
+            renderSettings();
+
+            break;
+
+
+        case "monthly":
+
+            renderMonthly();
+
+            break;
+
+
+        default:
+
+            renderDashboard();
 
     }
 
@@ -1046,54 +1419,78 @@ function loadPage(page){
 
 
 /*
-==============================
+==================================================
 DASHBOARD
-==============================
+==================================================
 */
 
 
 function renderDashboard(){
 
 
-    const app =
-    document.getElementById("app");
+let app =
+document.getElementById("app");
 
 
 
-    let paychecks =
-    generatePaychecks(1);
+let paycheck =
+generatePaychecks(1)[0];
 
 
 
-    let result =
-    calculatePaycheck(
-        paychecks[0]
-    );
+let result =
+calculatePaycheck(
+    paycheck
+);
 
 
 
-    let status =
-    getForecastStatus(
-        result
-    );
+let status =
+getForecastStatus(
+    result
+);
 
 
 
-    app.innerHTML = `
+app.innerHTML = `
+
 
 <div class="panel">
+
 
 <h2>
 PayDay Control Center
 </h2>
 
 
-<div class="status ${status.color}">
+<div class="status ${status.className}">
 
-${status.status}
+${status.text}
 
 </div>
 
+
+</div>
+
+
+
+<div class="grid">
+
+
+<div class="panel">
+
+<div class="card-label">
+
+Paycheck
+
+</div>
+
+
+<div class="card-value">
+
+$${paycheck.income}
+
+</div>
 
 </div>
 
@@ -1101,62 +1498,40 @@ ${status.status}
 
 <div class="panel">
 
-<h3>
-Current Paycheck
-</h3>
+<div class="card-label">
+
+Bills
+
+</div>
 
 
-<p>
-Pay Date:
-<b>
-${formatDate(paychecks[0].payDate)}
-</b>
-</p>
+<div class="card-value">
+
+$${calculateBillTotal(result.bills)}
+
+</div>
+
+</div>
 
 
-<p>
-Income:
-<b>
-$${settings.paycheckAmount}
-</b>
-</p>
+
+<div class="panel">
+
+<div class="card-label">
+
+Available
+
+</div>
 
 
-<p>
-Assigned Bills:
-<b>
-$${(
-result.priority1+
-result.priority2+
-result.priority3
-)}
-</b>
-</p>
-
-
-<p>
-Savings Target:
-<b>
-$${settings.savingsMinimum}
-</b>
-</p>
-
-
-<p>
-Protected Cash:
-<b>
-$${settings.leftoverTarget}
-</b>
-</p>
-
-
-<h3>
-
-Available:
+<div class="card-value">
 
 $${result.finalAvailable}
 
-</h3>
+</div>
+
+</div>
+
 
 
 </div>
@@ -1165,31 +1540,52 @@ $${result.finalAvailable}
 
 <div class="panel">
 
+
 <h3>
-Debt Snapshot
+Priority Breakdown
 </h3>
 
 
 <p>
-Credit Card:
-$16,250
+Priority 1:
+$${result.priority1Total}
 </p>
 
 
 <p>
-Personal Loans:
-$17,000
+Remaining:
+$${result.afterPriority1}
+</p>
+
+
+
+<p>
+Priority 2:
+$${result.priority2Total}
 </p>
 
 
 <p>
-Student Loans:
-$30,000
+Remaining:
+$${result.afterPriority2}
 </p>
+
+
+
+<p>
+Priority 3:
+$${result.priority3Total}
+</p>
+
+
+<p>
+Remaining:
+$${result.afterPriority3}
+</p>
+
 
 
 </div>
-
 
 `;
 
@@ -1198,97 +1594,53 @@ $30,000
 
 
 /*
-==============================
+==================================================
 BILLS PAGE
-==============================
+==================================================
 */
 
 
 function renderBills(){
 
 
-const app =
+let app =
 document.getElementById("app");
 
 
-
-let html="";
-
+let rows="";
 
 
-bills.forEach((bill,index)=>{
+PayDay.bills.forEach(bill=>{
 
 
-html += `
+rows += `
 
-<div class="panel">
+<tr>
 
+<td>${bill.name}</td>
 
-<h3>
-${bill.name}
-</h3>
+<td>$${bill.amount}</td>
 
+<td>${bill.priority}</td>
 
-<p>
-Amount:
-$${bill.amount}
-</p>
+<td>${bill.recurrence}</td>
 
+<td>${bill.status}</td>
 
-<p>
-Category:
-${bill.category}
-</p>
+<td>
 
-
-<p>
-Priority:
-${bill.priority}
-</p>
-
-
-<p>
-Recurring:
-${bill.recurrence}
-</p>
-
-
-<p>
-Next Occurrence:
-${bill.nextOccurrence || "Not Set"}
-</p>
-
-
-<p>
-Assignment:
-${bill.assignment}
-</p>
-
-
-<p>
-Status:
-${bill.status}
-</p>
-
-
-<button onclick="editBill(${index})">
-
-Edit
-
-</button>
-
-
-<button onclick="deleteBill(${index})">
+<button onclick="deleteBill(${bill.id})">
 
 Delete
 
 </button>
 
+</td>
 
-</div>
+
+</tr>
 
 `;
-
 
 });
 
@@ -1296,15 +1648,48 @@ Delete
 
 app.innerHTML = `
 
+
+<div class="panel">
+
+
 <h2>
 Bills
+
 </h2>
 
 
-${html}
+<table>
+
+
+<tr>
+
+<th>Name</th>
+
+<th>Amount</th>
+
+<th>Priority</th>
+
+<th>Frequency</th>
+
+<th>Status</th>
+
+<th></th>
+
+</tr>
+
+
+${rows}
+
+
+</table>
+
+
+</div>
+
 
 
 <div class="panel">
+
 
 <h3>
 Add Bill
@@ -1319,46 +1704,616 @@ placeholder="Name">
 placeholder="Amount">
 
 
-<input id="billDue"
+<input id="billDay"
 placeholder="Due Day">
 
 
-<select id="billCategory">
 
-<option>
-Housing
-</option>
+<button onclick="createBillFromForm()">
 
-<option>
-Loan
-</option>
+Add Bill
 
-<option>
-Debt
-</option>
+</button>
 
-<option>
-Utility
-</option>
 
-<option>
-Subscription
-</option>
+</div>
 
-<option>
-Other
-</option>
+`;
 
-</select>
+}
 
 
 
-<select id="billRecurrence">
+function createBillFromForm(){
 
 
-<option>
-One-Time
-</option>
+addBill({
+
+name:
+document.getElementById("billName").value,
+
+
+amount:
+Number(
+document.getElementById("billAmount").value
+),
+
+
+dueDay:
+Number(
+document.getElementById("billDay").value
+)
+
+
+});
+
+
+renderBills();
+
+
+}
+
+
+
+/*
+==================================================
+PAYCHECK PAGE
+==================================================
+*/
+
+
+function renderPaycheck(){
+
+
+let app =
+document.getElementById("app");
+
+
+let checks =
+generatePaychecks(12);
+
+
+
+let check =
+checks[
+PayDay.selectedPaycheck
+];
+
+
+
+let result =
+calculatePaycheck(check);
+
+
+
+app.innerHTML = `
+
+
+<div class="panel">
+
+
+<h2>
+Paycheck Planner
+</h2>
+
+
+<button onclick="previousPaycheck()">
+
+Previous
+
+</button>
+
+
+<button onclick="nextPaycheck()">
+
+Next
+
+</button>
+
+
+<h3>
+
+${formatDate(check.payDate)}
+
+</h3>
+
+
+</div>
+
+
+
+<div class="panel">
+
+
+<p>
+Starting Balance:
+$${result.startingBalance}
+</p>
+
+
+<p>
+Priority 1:
+$${result.priority1Total}
+</p>
+
+
+<p>
+Remaining:
+$${result.afterPriority1}
+</p>
+
+
+<p>
+Priority 2:
+$${result.priority2Total}
+</p>
+
+
+<p>
+Remaining:
+$${result.afterPriority2}
+</p>
+
+
+<p>
+Priority 3:
+$${result.priority3Total}
+</p>
+
+
+<p>
+Final Available:
+$${result.finalAvailable}
+</p>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+function nextPaycheck(){
+
+
+PayDay.selectedPaycheck++;
+
+
+renderPaycheck();
+
+
+}
+
+
+
+function previousPaycheck(){
+
+
+PayDay.selectedPaycheck--;
+
+
+if(
+PayDay.selectedPaycheck < 0
+){
+
+PayDay.selectedPaycheck=0;
+
+}
+
+
+renderPaycheck();
+
+
+}
+
+
+
+/*
+==================================================
+REPORTS
+==================================================
+*/
+
+
+function renderReports(){
+
+
+document.getElementById("app").innerHTML = `
+
+
+<div class="panel">
+
+<h2>
+Reports
+</h2>
+
+
+<p>
+Monthly Income:
+$${calculateMonthlyIncome()}
+</p>
+
+
+<p>
+Monthly Bills:
+$${calculateMonthlyBills()}
+</p>
+
+
+<p>
+Remaining:
+$${calculateMonthlyRemaining()}
+</p>
+
+
+</div>
+
+`;
+
+}
+
+
+
+/*
+==================================================
+SCENARIO MODE
+==================================================
+*/
+
+
+function renderScenario(){
+
+
+document.getElementById("app").innerHTML = `
+
+
+<div class="panel">
+
+
+<h2>
+Scenario Mode
+</h2>
+
+
+<p>
+Test changes without affecting your real budget.
+</p>
+
+
+</div>
+
+
+`;
+
+}
+/*
+==================================================
+PayDay Version 1.8.1
+app.js
+Part 3 / 3
+
+Monthly Budget
+Settings
+Startup
+==================================================
+*/
+
+
+/*
+==================================================
+MONTHLY BUDGET PAGE
+==================================================
+*/
+
+
+function renderMonthly(){
+
+
+let app =
+document.getElementById("app");
+
+
+let month =
+PayDay.selectedMonth
+.toLocaleDateString(
+"en-US",
+{
+    month:"long",
+    year:"numeric"
+}
+);
+
+
+
+let income =
+calculateMonthlyIncome();
+
+
+
+let expenses =
+calculateMonthlyBills();
+
+
+
+app.innerHTML = `
+
+
+<div class="panel">
+
+
+<h2>
+
+Monthly Budget
+
+</h2>
+
+
+
+<button onclick="previousMonth()">
+
+◀
+
+</button>
+
+
+<b>
+
+${month}
+
+</b>
+
+
+<button onclick="nextMonth()">
+
+▶
+
+</button>
+
+
+</div>
+
+
+
+<div class="grid">
+
+
+<div class="panel">
+
+<div class="card-label">
+
+Income
+
+</div>
+
+
+<div class="card-value">
+
+$${income}
+
+</div>
+
+</div>
+
+
+
+<div class="panel">
+
+<div class="card-label">
+
+Bills
+
+</div>
+
+
+<div class="card-value">
+
+$${expenses}
+
+</div>
+
+</div>
+
+
+
+<div class="panel">
+
+<div class="card-label">
+
+Remaining
+
+</div>
+
+
+<div class="card-value">
+
+$${income-expenses}
+
+</div>
+
+</div>
+
+
+
+</div>
+
+
+
+<div class="panel">
+
+
+<h3>
+
+Bill Calendar
+
+</h3>
+
+
+${renderCalendar()}
+
+
+</div>
+
+`;
+
+}
+
+
+
+function nextMonth(){
+
+
+PayDay.selectedMonth =
+
+addMonths(
+
+PayDay.selectedMonth,
+
+1
+
+);
+
+
+renderMonthly();
+
+
+}
+
+
+
+function previousMonth(){
+
+
+PayDay.selectedMonth =
+
+addMonths(
+
+PayDay.selectedMonth,
+
+-1
+
+);
+
+
+renderMonthly();
+
+
+}
+
+
+
+/*
+==================================================
+CALENDAR
+==================================================
+*/
+
+
+function renderCalendar(){
+
+
+let output = "";
+
+
+
+PayDay.bills.forEach(
+bill=>{
+
+
+output += `
+
+<p>
+
+<b>
+${bill.dueDay}
+</b>
+
+-
+${bill.name}
+
+-
+
+$${bill.amount}
+
+</p>
+
+`;
+
+
+});
+
+
+return output;
+
+
+}
+
+
+
+/*
+==================================================
+SETTINGS PAGE
+==================================================
+*/
+
+
+function renderSettings(){
+
+
+let app =
+document.getElementById("app");
+
+
+
+app.innerHTML = `
+
+
+<div class="panel">
+
+
+<h2>
+Settings
+</h2>
+
+
+<label>
+Paycheck Amount
+</label>
+
+
+<input id="settingPay"
+
+value="${PayDay.settings.paycheckAmount}">
+
+
+<br><br>
+
+
+<label>
+Next Pay Date
+</label>
+
+
+<input
+
+type="date"
+
+id="settingDate"
+
+value="${PayDay.settings.nextPayDate}">
+
+
+<br><br>
+
+
+<label>
+Pay Frequency
+</label>
+
+
+<select id="settingFrequency">
 
 
 <option>
@@ -1379,736 +2334,7 @@ Monthly
 </select>
 
 
-
-<select id="billPriority">
-
-<option value="1">
-Priority 1
-</option>
-
-<option value="2">
-Priority 2
-</option>
-
-<option value="3">
-Priority 3
-</option>
-
-
-</select>
-
-
-
-<button onclick="addBill()">
-
-Add Bill
-
-</button>
-
-
-</div>
-
-
-`;
-
-}
-
-
-
-/*
-==============================
-ADD BILL
-==============================
-*/
-
-
-function addBill(){
-
-
-let bill =
-createBill({
-
-name:
-document.getElementById("billName").value,
-
-
-amount:
-Number(
-document.getElementById("billAmount").value
-),
-
-
-dueDay:
-Number(
-document.getElementById("billDue").value
-),
-
-
-category:
-document.getElementById("billCategory").value,
-
-
-recurrence:
-document.getElementById("billRecurrence").value,
-
-
-priority:
-Number(
-document.getElementById("billPriority").value
-)
-
-
-});
-
-
-
-bills.push(bill);
-
-
-saveBills();
-
-
-renderBills();
-
-
-}
-
-
-
-/*
-==============================
-DELETE BILL
-==============================
-*/
-
-
-function deleteBill(index){
-
-
-bills.splice(
-index,
-1
-);
-
-
-saveBills();
-
-
-renderBills();
-
-
-}
-
-
-
-/*
-==============================
-EDIT BILL
-==============================
-*/
-
-
-function editBill(index){
-
-
-let bill =
-bills[index];
-
-
-
-let amount =
-prompt(
-"Amount",
-bill.amount
-);
-
-
-
-if(amount!==null){
-
-
-bill.amount =
-Number(amount);
-
-
-
-}
-
-
-let status =
-prompt(
-"Status",
-bill.status
-);
-
-
-
-if(status!==null){
-
-
-bill.status =
-status;
-
-
-}
-
-
-
-saveBills();
-
-
-renderBills();
-
-
-}
-
-
-
-/*
-==============================
-SET DISPLAY MODE
-==============================
-*/
-
-
-function setDisplayMode(mode){
-
-
-settings.displayMode =
-mode;
-
-
-saveSettings();
-
-
-loadPage("dashboard");
-
-
-}
-/*
-PAYDAY VERSION 1.8
-app.js
-Part 3/3
-
-Final Pages + Startup
-*/
-
-
-/*
-==============================
-SELECTED PAYCHECK
-==============================
-*/
-
-
-let selectedPaycheck = 0;
-
-
-
-/*
-==============================
-PAYCHECK PAGE
-==============================
-*/
-
-
-function renderPaycheck(){
-
-
-const app =
-document.getElementById("app");
-
-
-
-let paychecks =
-generatePaychecks(12);
-
-
-
-let paycheck =
-paychecks[selectedPaycheck];
-
-
-
-let result =
-calculatePaycheck(
-paycheck
-);
-
-
-
-let status =
-getForecastStatus(
-result
-);
-
-
-
-app.innerHTML = `
-
-
-<div class="panel">
-
-
-<h2>
-Paycheck Planner
-</h2>
-
-
-
-<button onclick="previousPaycheck()">
-
-◀ Previous
-
-</button>
-
-
-
-<button onclick="nextPaycheck()">
-
-Next ▶
-
-</button>
-
-
-
-<h3>
-
-${formatDate(paycheck.payDate)}
-
-</h3>
-
-
-
-<div class="status ${status.color}">
-
-${status.status}
-
-</div>
-
-
-</div>
-
-
-
-<div class="panel">
-
-
-<h3>
-Starting Balance
-</h3>
-
-
-$${result.starting}
-
-
-
-<h3>
-Priority 1 - Required
-</h3>
-
-$${result.priority1}
-
-
-
-<p>
-Remaining:
-
-$${result.afterPriority1}
-
-</p>
-
-
-
-<h3>
-Priority 2 - Debt
-</h3>
-
-$${result.priority2}
-
-
-
-<p>
-Remaining:
-
-$${result.afterPriority2}
-
-</p>
-
-
-
-<h3>
-Priority 3 - Goals
-</h3>
-
-$${result.priority3}
-
-
-
-<p>
-Remaining:
-
-$${result.afterPriority3}
-
-</p>
-
-
-
-<h3>
-Savings
-
-</h3>
-
-$${settings.savingsMinimum}
-
-
-
-<h3>
-Protected Cash
-
-</h3>
-
-$${settings.leftoverTarget}
-
-
-
-<h2>
-
-Final Available
-
-$${result.finalAvailable}
-
-</h2>
-
-
-</div>
-
-
-`;
-
-}
-
-
-
-/*
-==============================
-PAYCHECK NAVIGATION
-==============================
-*/
-
-
-function nextPaycheck(){
-
-
-selectedPaycheck++;
-
-
-if(selectedPaycheck>11){
-
-selectedPaycheck=11;
-
-}
-
-
-renderPaycheck();
-
-
-}
-
-
-
-function previousPaycheck(){
-
-
-selectedPaycheck--;
-
-
-if(selectedPaycheck<0){
-
-selectedPaycheck=0;
-
-}
-
-
-renderPaycheck();
-
-
-}
-
-
-
-/*
-==============================
-MONTHLY BUDGET
-==============================
-*/
-
-
-let selectedMonth =
-new Date();
-
-
-
-function renderMonthly(){
-
-
-const app =
-document.getElementById("app");
-
-
-
-let month =
-selectedMonth
-.toLocaleDateString(
-"en-US",
-{
-month:"long",
-year:"numeric"
-}
-);
-
-
-
-let total =
-bills.reduce(
-(sum,bill)=>
-sum+bill.amount,
-0
-);
-
-
-
-app.innerHTML = `
-
-
-<div class="panel">
-
-
-<h2>
-Monthly Budget
-
-</h2>
-
-
-
-<button onclick="previousMonth()">
-
-◀
-
-</button>
-
-
-<b>
-${month}
-</b>
-
-
-<button onclick="nextMonth()">
-
-▶
-
-</button>
-
-
-</div>
-
-
-
-<div class="panel">
-
-
-<h3>
-Monthly Income
-
-</h3>
-
-$${settings.paycheckAmount * 2}
-
-
-
-<h3>
-Monthly Bills
-
-</h3>
-
-$${total}
-
-
-
-<h3>
-Remaining
-
-</h3>
-
-
-$${
-
-(settings.paycheckAmount*2)-total
-
-}
-
-
-
-</div>
-
-
-
-<div class="panel">
-
-
-<h3>
-Calendar
-
-</h3>
-
-
-${renderCalendar()}
-
-
-</div>
-
-
-`;
-
-}
-
-
-
-/*
-==============================
-MONTH NAVIGATION
-==============================
-*/
-
-
-function nextMonth(){
-
-selectedMonth =
-addMonths(
-selectedMonth,
-1
-);
-
-
-renderMonthly();
-
-
-}
-
-
-
-function previousMonth(){
-
-selectedMonth =
-addMonths(
-selectedMonth,
--1
-);
-
-
-renderMonthly();
-
-
-}
-
-
-
-/*
-==============================
-CALENDAR
-==============================
-*/
-
-
-function renderCalendar(){
-
-
-let html="";
-
-
-
-bills.forEach(bill=>{
-
-
-html += `
-
-<p>
-
-<b>
-${bill.dueDay}
-</b>
-
--
-${bill.name}
-
--
-
-$${bill.amount}
-
-</p>
-
-`;
-
-});
-
-
-return html;
-
-
-}
-
-
-
-/*
-==============================
-SETTINGS PAGE
-==============================
-*/
-
-
-function renderSettings(){
-
-
-const app =
-document.getElementById("app");
-
-
-
-app.innerHTML = `
-
-
-<div class="panel">
-
-
-<h2>
-Settings
-</h2>
-
-
-
-<label>
-Paycheck Amount
-</label>
-
-
-<input id="payAmount"
-value="${settings.paycheckAmount}"
->
-
-
-
-<label>
-Next Pay Date
-</label>
-
-
-<input 
-id="nextPay"
-type="date"
-value="${settings.nextPayDate}"
->
-
-
+<br><br>
 
 
 <label>
@@ -2117,29 +2343,33 @@ Savings Minimum
 
 
 <input
-id="saveMinimum"
-value="${settings.savingsMinimum}"
->
+
+id="settingSavings"
+
+value="${PayDay.settings.savingsMinimum}">
 
 
+<br><br>
 
 
 <label>
-Protected Cash
+Leftover Cash
 </label>
 
 
 <input
-id="leftover"
-value="${settings.leftoverTarget}"
->
+
+id="settingCash"
+
+value="${PayDay.settings.leftoverTarget}">
 
 
+<br><br>
 
 
-<button onclick="saveUserSettings()">
+<button onclick="saveSettingsForm()">
 
-Save
+Save Settings
 
 </button>
 
@@ -2152,9 +2382,10 @@ Save
 
 
 <h3>
-Testing Tools
-</h3>
 
+Testing
+
+</h3>
 
 
 <button onclick="loadSampleBudget()">
@@ -2164,16 +2395,14 @@ Load Sample Budget
 </button>
 
 
-
 <button onclick="clearAllData()">
 
-Clear All Data
+Clear Data
 
 </button>
 
 
 </div>
-
 
 
 `;
@@ -2183,37 +2412,63 @@ Clear All Data
 
 
 /*
-==============================
-SAVE SETTINGS FROM PAGE
-==============================
+==================================================
+SAVE SETTINGS FORM
+==================================================
 */
 
 
-function saveUserSettings(){
+function saveSettingsForm(){
 
 
-settings.paycheckAmount =
+PayDay.settings.paycheckAmount =
+
 Number(
-document.getElementById("payAmount").value
+
+document.getElementById(
+"settingPay"
+).value
+
 );
 
 
 
-settings.nextPayDate =
-document.getElementById("nextPay").value;
+PayDay.settings.nextPayDate =
+
+document.getElementById(
+"settingDate"
+).value;
 
 
 
-settings.savingsMinimum =
+PayDay.settings.payFrequency =
+
+document.getElementById(
+"settingFrequency"
+).value;
+
+
+
+PayDay.settings.savingsMinimum =
+
 Number(
-document.getElementById("saveMinimum").value
+
+document.getElementById(
+"settingSavings"
+).value
+
 );
 
 
 
-settings.leftoverTarget =
+PayDay.settings.leftoverTarget =
+
 Number(
-document.getElementById("leftover").value
+
+document.getElementById(
+"settingCash"
+).value
+
 );
 
 
@@ -2222,7 +2477,9 @@ saveSettings();
 
 
 
-renderSettings();
+alert(
+"Settings Saved"
+);
 
 
 }
@@ -2230,23 +2487,74 @@ renderSettings();
 
 
 /*
-==============================
-START APP
-==============================
+==================================================
+DISPLAY MODE
+==================================================
+*/
+
+
+function setDisplayMode(mode){
+
+
+PayDay.settings.displayMode =
+mode;
+
+
+saveSettings();
+
+
+
+let body =
+document.body;
+
+
+
+if(mode==="graphic"){
+
+
+body.classList.add(
+"graphic"
+);
+
+
+}
+
+
+else{
+
+
+body.classList.remove(
+"graphic"
+);
+
+
+}
+
+
+}
+
+
+
+/*
+==================================================
+START APPLICATION
+==================================================
 */
 
 
 function startPayDay(){
 
 
-loadSettings();
-
-
-loadBills();
+initializeData();
 
 
 
-if(!document.getElementById("app")){
+let app =
+document.getElementById("app");
+
+
+
+if(!app){
 
 return;
 
@@ -2255,47 +2563,46 @@ return;
 
 
 if(
-bills.length===0
+PayDay.bills.length===0
 ){
 
 
-document.getElementById("app").innerHTML = `
+app.innerHTML = `
 
 
 <div class="panel">
 
+
 <h2>
-Welcome to PayDay
+
+Welcome To PayDay
 
 </h2>
 
 
 <p>
+
 No budget data found.
+
 </p>
 
 
 
-<button onclick="loadSampleBudget();loadPage('dashboard')">
+<button onclick="loadSampleBudget();renderDashboard()">
 
 Load Sample Budget
 
 </button>
 
 
-<button onclick="loadPage('settings')">
-
-Start My Budget
-
-</button>
-
 
 </div>
 
-
 `;
 
+
 return;
+
 
 }
 
