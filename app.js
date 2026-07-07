@@ -1,6 +1,20 @@
 let displayMode = localStorage.getItem("paydayDisplayMode") || "standard";
 
 
+let settings = JSON.parse(localStorage.getItem("paydaySettings")) || {
+
+savingsMinimum:100,
+
+leftoverTarget:150,
+
+payFrequency:"Bi-Weekly",
+
+nextPayDate:""
+
+};
+
+
+
 let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 
 {name:"Rent",amount:1150,due:"1st",type:"Housing",priority:1},
@@ -16,12 +30,17 @@ let bills = JSON.parse(localStorage.getItem("paydayBills")) || [
 ];
 
 
+
 const budget = {
 
 income:4368,
+
 paycheck:2184,
+
 creditCard:16250,
+
 personalLoans:17000,
+
 studentLoans:30000
 
 };
@@ -42,6 +61,17 @@ JSON.stringify(bills)
 function saveSettings(){
 
 localStorage.setItem(
+"paydaySettings",
+JSON.stringify(settings)
+);
+
+}
+
+
+
+function saveDisplayMode(){
+
+localStorage.setItem(
 "paydayDisplayMode",
 displayMode
 );
@@ -54,7 +84,7 @@ function setDisplayMode(mode){
 
 displayMode = mode;
 
-saveSettings();
+saveDisplayMode();
 
 loadPage("settings");
 
@@ -120,25 +150,33 @@ Dashboard
 
 <p>
 Monthly Income:
-<b>$${budget.income}</b>
+<b>
+$${budget.income}
+</b>
 </p>
 
 
 <p>
 Required Bills:
-<b>$${required}</b>
+<b>
+$${required}
+</b>
 </p>
 
 
 <p>
 Debt Payments:
-<b>$${debt}</b>
+<b>
+$${debt}
+</b>
 </p>
 
 
 <p>
 Goals:
-<b>$${goals}</b>
+<b>
+$${goals}
+</b>
 </p>
 
 
@@ -158,7 +196,6 @@ Standard Mode Active
 
 
 }else{
-
 
 
 app.innerHTML=`
@@ -210,7 +247,6 @@ Graphic Mode Active
 }
 
 
-
 }
 
 
@@ -224,18 +260,13 @@ app.innerHTML=`
 <div class="panel">
 
 <h2>
-Display Settings
+PayDay Settings
 </h2>
 
 
-<p>
-Current Mode:
-<b>
-${displayMode==="standard"?
-"Standard Mode":
-"Graphic Mode"}
-</b>
-</p>
+<h3>
+Display Mode
+</h3>
 
 
 <button onclick="setDisplayMode('standard')">
@@ -248,14 +279,81 @@ Graphic Mode
 </button>
 
 
+
+<h3>
+Savings Minimum Per Paycheck
+</h3>
+
+
+<input 
+id="saveAmount"
+type="number"
+value="${settings.savingsMinimum}"
+>
+
+
+<h3>
+Leftover Cash Target
+</h3>
+
+
+<input
+id="cashTarget"
+type="number"
+value="${settings.leftoverTarget}"
+>
+
+
+<h3>
+Pay Frequency
+</h3>
+
+
+<select id="frequency">
+
+<option ${settings.payFrequency==="Weekly"?"selected":""}>
+Weekly
+</option>
+
+
+<option ${settings.payFrequency==="Bi-Weekly"?"selected":""}>
+Bi-Weekly
+</option>
+
+
+<option ${settings.payFrequency==="Monthly"?"selected":""}>
+Monthly
+</option>
+
+
+</select>
+
+
+<h3>
+Next Pay Date
+</h3>
+
+
+<input
+id="payDate"
+value="${settings.nextPayDate}"
+placeholder="MM/DD/YYYY"
+>
+
+
+<br><br>
+
+
+<button onclick="saveUserSettings()">
+Save Settings
+</button>
+
+
 </div>
 
 `;
 
 }
-
-
-
 if(page==="bills"){
 
 
@@ -287,6 +385,7 @@ Delete
 </button>
 
 </td>
+
 
 </tr>
 
@@ -348,31 +447,20 @@ Add Bill
 
 <select id="billType">
 
-<option>
-Housing
-</option>
+<option>Housing</option>
 
-<option>
-Debt
-</option>
+<option>Debt</option>
 
-<option>
-Loan
-</option>
+<option>Loan</option>
 
-<option>
-Utility
-</option>
+<option>Utility</option>
 
-<option>
-Subscription
-</option>
+<option>Subscription</option>
 
-<option>
-Goal
-</option>
+<option>Goal</option>
 
 </select>
+
 
 
 <select id="billPriority">
@@ -392,6 +480,7 @@ Priority 3 - Goal
 </select>
 
 
+
 <button onclick="addBill()">
 Add Bill
 </button>
@@ -402,7 +491,36 @@ Add Bill
 `;
 
 }
-  if(page==="paycheck"){
+
+
+
+
+if(page==="paycheck"){
+
+
+let required = bills
+.filter(b=>b.priority===1)
+.reduce((s,b)=>s+b.amount,0);
+
+
+
+let debt = bills
+.filter(b=>b.priority===2)
+.reduce((s,b)=>s+b.amount,0);
+
+
+
+let available =
+budget.paycheck
+-
+required
+-
+debt
+-
+settings.savingsMinimum
+-
+settings.leftoverTarget;
+
 
 
 app.innerHTML=`
@@ -423,13 +541,41 @@ $${budget.paycheck}
 
 
 <p>
-Priority 1 bills funded first
+Priority 1 Bills:
+<b>
+$${required}
+</b>
 </p>
 
 
 <p>
-Rent reserve enabled
+Priority 2 Debt:
+<b>
+$${debt}
+</b>
 </p>
+
+
+<p>
+Savings:
+<b>
+$${settings.savingsMinimum}
+</b>
+</p>
+
+
+<p>
+Protected Cash:
+<b>
+$${settings.leftoverTarget}
+</b>
+</p>
+
+
+<h3>
+Available:
+$${available}
+</h3>
 
 
 </div>
@@ -437,6 +583,7 @@ Rent reserve enabled
 `;
 
 }
+
 
 
 
@@ -482,6 +629,7 @@ $${bills.reduce((s,b)=>s+b.amount,0)}
 
 
 
+
 if(page==="scenario"){
 
 
@@ -499,11 +647,6 @@ Simulation Only
 </div>
 
 
-<p>
-Test financial changes here without affecting your real budget.
-</p>
-
-
 </div>
 
 `;
@@ -511,8 +654,37 @@ Test financial changes here without affecting your real budget.
 }
 
 
+}
+
+
+
+
+function saveUserSettings(){
+
+settings.savingsMinimum =
+Number(document.getElementById("saveAmount").value);
+
+
+settings.leftoverTarget =
+Number(document.getElementById("cashTarget").value);
+
+
+settings.payFrequency =
+document.getElementById("frequency").value;
+
+
+settings.nextPayDate =
+document.getElementById("payDate").value;
+
+
+
+saveSettings();
+
+
+loadPage("settings");
 
 }
+
 
 
 
@@ -538,23 +710,21 @@ priority:Number(document.getElementById("billPriority").value)
 
 if(bill.name && bill.amount){
 
-
 bills.push(bill);
 
 saveBills();
 
 loadPage("bills");
 
-
 }
 
 
 }
+
 
 
 
 function deleteBill(index){
-
 
 bills.splice(index,1);
 
@@ -562,11 +732,12 @@ saveBills();
 
 loadPage("bills");
 
-
 }
 
 
 
 saveBills();
+
+saveSettings();
 
 loadPage("dashboard");
